@@ -55,4 +55,38 @@ export default class StatusApi<P extends Object> {
 
     return status;
   }
+
+  set<R, C = R>({
+    pathname,
+    params,
+    method,
+    body,
+    intercepter,
+  }: {
+    pathname: string;
+    params: P;
+    method: 'POST' | 'PATCH' | 'DELETE';
+    body?: Partial<R>;
+    intercepter?: (response: R) => C;
+  }) {
+    const url = this.getUrl(pathname, params);
+    const status = createStatus<C>(url);
+
+    status.request();
+    fetch(url, {
+      method,
+      body: JSON.stringify(body),
+    })
+      .then<R>((response) => response.json())
+      .then((response) => {
+        status.success(
+          intercepter ? intercepter(response) : (response as unknown as C)
+        );
+      })
+      .catch((error: Error) => {
+        status.failure(error.message ?? 'Unknown Error');
+      });
+
+    return status;
+  }
 }

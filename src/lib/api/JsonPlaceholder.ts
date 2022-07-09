@@ -49,4 +49,21 @@ export default class JsonPlaceholder<E extends { id: number }> {
       },
     });
   }
+
+  update(id: E['id'], body: Partial<E>) {
+    return JsonPlaceholder.statusApi.set<E>({
+      pathname: `${this.path}/${id}`,
+      params: {},
+      method: 'PATCH',
+      body,
+      intercepter: (response) => {
+        const entity = { ...response, ...body };
+        const { entities } = normalize(entity, this.schema);
+
+        mergeEntities(entities);
+
+        return entity;
+      },
+    });
+  }
 }

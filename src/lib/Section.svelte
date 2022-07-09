@@ -4,7 +4,10 @@
   import type { TextfieldComponentDev } from '@smui/textfield';
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
-  import type { Section } from './api/api';
+  import { onDestroy } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
+  import { Section, sectionApi } from './api/api';
+  import type { Status } from './modules/status-api/status';
   import { mapKeyToEntities } from './store/entities';
 
   const sections = mapKeyToEntities.sections;
@@ -18,6 +21,8 @@
 
   $: section = $sections[id];
   $: isEdit = editId === id;
+
+  let updateUnsubscribe: Unsubscriber;
 
   function toggleEdit() {
     if (isEdit) {
@@ -44,12 +49,34 @@
     };
   }
 
+  function postProcess({ isFetching, failMessage }: Status<unknown>) {
+    if (isFetching) {
+      return;
+    }
+
+    if (failMessage) {
+      return;
+    }
+
+    if (editId !== id) {
+      return;
+    }
+
+    editId = NaN;
+  }
+
   function update() {
     const body = validate();
     if (!body) {
       return;
     }
+
+    updateUnsubscribe = sectionApi.update(id, body).subscribe(postProcess);
   }
+
+  onDestroy(() => {
+    updateUnsubscribe && updateUnsubscribe();
+  });
 </script>
 
 <div class="placeholder">

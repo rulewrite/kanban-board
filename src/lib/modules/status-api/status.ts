@@ -1,6 +1,6 @@
 import { Readable, writable } from 'svelte/store';
 
-interface Status<C> {
+export interface Status<C> {
   key: string;
   isFetching: boolean;
   receivedAt: number;
