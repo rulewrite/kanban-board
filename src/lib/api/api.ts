@@ -10,6 +10,7 @@ export interface Card {
   body: string;
 }
 const cardSchema = new schema.Entity<Card>(CARDS_SCHEMA_KEY);
+export const cardApi = new JsonPlaceholder<Card>('comments', cardSchema);
 
 export interface Section {
   id: number;

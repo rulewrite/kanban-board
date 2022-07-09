@@ -5,7 +5,8 @@
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
   import { fade } from 'svelte/transition';
-  import type { Card as CardType } from './api/api';
+  import { Card as CardType, cardApi } from './api/api';
+  import type { Status } from './modules/status-api/status';
   import { editCardId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
 
@@ -42,11 +43,25 @@
     };
   }
 
+  function postProcess({ isFetching, failMessage }: Status<unknown>) {
+    if (isFetching) {
+      return;
+    }
+
+    if (failMessage) {
+      return;
+    }
+
+    editCardId.off(id);
+  }
+
   function update() {
     const body = validate();
     if (!body) {
       return;
     }
+
+    cardApi.update(id, body).subscribe(postProcess);
   }
 </script>
 
