@@ -27,3 +27,4 @@ function createEditId(id = NaN) {
 }
 
 export const editSectionId = createEditId();
+export const editCardId = createEditId();
