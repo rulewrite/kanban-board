@@ -1,10 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Section as SectionType, sectionApi } from './api/api';
+  import { sectionApi } from './api/api';
   import Section from './Section.svelte';
 
   let status: ReturnType<typeof sectionApi.readList>;
-  let editId: SectionType['id'] = NaN;
 
   $: requestKey = $status?.key;
 
@@ -15,9 +14,9 @@
 
 <div class="wrapper">
   {#each $status?.cargo ?? [] as id (id)}
-    <Section {id} bind:editId {requestKey} />
+    <Section {id} {requestKey} />
   {/each}
-  <Section bind:editId {requestKey} />
+  <Section {requestKey} />
 </div>
 
 <style>

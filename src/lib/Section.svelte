@@ -9,12 +9,12 @@
   import { Section, sectionApi } from './api/api';
   import Card from './Card.svelte';
   import type { Status } from './modules/status-api/status';
+  import { editSectionId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
 
   const sections = mapKeyToEntities.sections;
 
   export let id: Section['id'] = 0;
-  export let editId: Section['id'] = NaN;
   export let requestKey: string = '';
 
   let titleInput: TextfieldComponentDev;
@@ -22,21 +22,19 @@
   let body = '';
 
   $: section = $sections[id];
-  $: isEdit = editId === id;
+  $: isEdit = $editSectionId === id;
 
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
   let deleteUnsubscribe: Unsubscriber;
 
   function toggleEdit() {
-    if (isEdit) {
-      editId = NaN;
-      return;
+    if (!isEdit) {
+      title = section?.title ?? '';
+      body = section?.body ?? '';
     }
 
-    title = section?.title ?? '';
-    body = section?.body ?? '';
-    editId = id;
+    editSectionId.toggle(id);
   }
 
   function validate() {
@@ -62,11 +60,7 @@
       return;
     }
 
-    if (editId !== id) {
-      return;
-    }
-
-    editId = NaN;
+    editSectionId.off(id);
   }
 
   function create() {
