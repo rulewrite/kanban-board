@@ -25,19 +25,29 @@ export default class StatusApi<P extends Object> {
     return `${this.URL}/${pathname}${StatusApi.paramsToString(params)}`;
   }
 
-  get<R>({ pathname, params }: { pathname: string; params: P }) {
+  get<R, C = R>({
+    pathname,
+    params,
+    intercepter,
+  }: {
+    pathname: string;
+    params: P;
+    intercepter?: (response: R) => C;
+  }) {
     const url = this.getUrl(pathname, params);
 
     if (!this.mapKeyToStatus.has(url)) {
-      this.mapKeyToStatus.set(url, createStatus<R>(url));
+      this.mapKeyToStatus.set(url, createStatus<C>(url));
     }
-    const status = this.mapKeyToStatus.get(url) as StatusStore<R>;
+    const status = this.mapKeyToStatus.get(url) as StatusStore<C>;
 
     status.request();
     fetch(url)
       .then<R>((response) => response.json())
       .then((response) => {
-        status.success(response);
+        status.success(
+          intercepter ? intercepter(response) : (response as unknown as C)
+        );
       })
       .catch((error: Error) => {
         status.failure(error.message ?? 'Unknown Error');

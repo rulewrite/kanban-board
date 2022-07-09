@@ -2,7 +2,9 @@
   import Paper, { Subtitle, Title } from '@smui/paper';
   import { onMount } from 'svelte';
   import { sectionApi } from './api/api';
+  import { mapKeyToEntities } from './store/entities';
 
+  const sections = mapKeyToEntities.sections;
   let status: ReturnType<typeof sectionApi.readList>;
 
   onMount(() => {
@@ -11,7 +13,8 @@
 </script>
 
 <div class="wrapper">
-  {#each $status?.cargo ?? [] as section (section.id)}
+  {#each $status?.cargo ?? [] as id (id)}
+    {@const section = $sections[id]}
     <div class="placeholder">
       <Paper>
         <Title>{section.title}</Title>
