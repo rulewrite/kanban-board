@@ -12,8 +12,9 @@
 
   const sections = mapKeyToEntities.sections;
 
-  export let id: Section['id'];
+  export let id: Section['id'] = 0;
   export let editId: Section['id'] = NaN;
+  export let requestKey: string = '';
 
   let titleInput: TextfieldComponentDev;
   let title = '';
@@ -22,6 +23,7 @@
   $: section = $sections[id];
   $: isEdit = editId === id;
 
+  let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
 
   function toggleEdit() {
@@ -65,6 +67,17 @@
     editId = NaN;
   }
 
+  function create() {
+    const body = validate();
+    if (!body) {
+      return;
+    }
+
+    createUnsubscribe = sectionApi
+      .create(body, requestKey)
+      .subscribe(postProcess);
+  }
+
   function update() {
     const body = validate();
     if (!body) {
@@ -75,6 +88,7 @@
   }
 
   onDestroy(() => {
+    createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
   });
 </script>
@@ -102,12 +116,12 @@
           <Button on:click={toggleEdit} color="secondary">
             <Label>취소</Label>
           </Button>
-          <Button on:click={update}>
-            <Label>완료</Label>
+          <Button on:click={section ? update : create}>
+            <Label>{section ? '완료' : '생성'}</Label>
           </Button>
         </Group>
       </Content>
-    {:else}
+    {:else if section}
       <Title>{section.title}</Title>
       <Subtitle>{section.body}</Subtitle>
       <Content>
@@ -115,6 +129,10 @@
           <Label>수정</Label>
         </Button>
       </Content>
+    {:else}
+      <Button color="primary" on:click={toggleEdit}>
+        <Label>섹션 생성하기</Label>
+      </Button>
     {/if}
   </Paper>
 </div>

@@ -6,6 +6,8 @@
   let status: ReturnType<typeof sectionApi.readList>;
   let editId: SectionType['id'] = NaN;
 
+  $: requestKey = $status?.key;
+
   onMount(() => {
     status = sectionApi.readList({ _page: 1, _limit: 5 });
   });
@@ -15,6 +17,7 @@
   {#each $status?.cargo ?? [] as id (id)}
     <Section {id} bind:editId />
   {/each}
+  <Section bind:editId {requestKey} />
 </div>
 
 <style>

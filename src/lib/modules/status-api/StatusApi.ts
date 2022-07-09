@@ -25,6 +25,10 @@ export default class StatusApi<P extends Object> {
     return `${this.URL}/${pathname}${StatusApi.paramsToString(params)}`;
   }
 
+  getStatus<C>(key: string) {
+    return (this.mapKeyToStatus.get(key) as StatusStore<C>) ?? null;
+  }
+
   get<R, C = R>({
     pathname,
     params,

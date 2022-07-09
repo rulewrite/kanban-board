@@ -1,3 +1,4 @@
+import { uniq } from 'lodash-es';
 import { normalize, schema } from 'normalizr';
 import StatusApi from '../modules/status-api/StatusApi';
 import { mergeEntities } from '../store/entities';
@@ -21,6 +22,32 @@ export default class JsonPlaceholder<E extends { id: number }> {
   );
 
   constructor(private path: string, private schema: schema.Entity<E>) {}
+
+  create(body: Omit<E, 'id'>, key: string) {
+    return JsonPlaceholder.statusApi.set<Pick<E, 'id'>, E>({
+      pathname: this.path,
+      params: {},
+      method: 'POST',
+      body,
+      intercepter: (response) => {
+        const entity = { ...response, ...body } as E;
+        const { entities, result } = normalize(entity, this.schema);
+
+        mergeEntities(entities);
+
+        const status = JsonPlaceholder.statusApi.getStatus<Array<E['id']>>(key);
+        if (!status) {
+          return entity;
+        }
+
+        status.updateCargo((cargo) => {
+          return uniq([...cargo, result]);
+        });
+
+        return entity;
+      },
+    });
+  }
 
   read(id: E['id'], params: Params) {
     return JsonPlaceholder.statusApi.get<E, E['id']>({

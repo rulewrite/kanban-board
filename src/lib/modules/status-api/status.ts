@@ -14,6 +14,7 @@ export interface StatusStore<C> {
   request: () => void;
   success: (cargo: Status<C>['cargo']) => void;
   failure: (failMessage: string) => void;
+  updateCargo: (updater: (cargo: C) => C) => void;
 }
 
 export function createStatus<C>(key: string): StatusStore<C> {
@@ -54,6 +55,14 @@ export function createStatus<C>(key: string): StatusStore<C> {
         isFetching: false,
         receivedAt: Date.now(),
         failMessage,
+      });
+    },
+    updateCargo: (updater: (cargo: C) => C) => {
+      update((status) => {
+        return {
+          ...status,
+          cargo: updater(status.cargo),
+        };
       });
     },
   };
