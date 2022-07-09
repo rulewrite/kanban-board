@@ -7,6 +7,7 @@
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { Section, sectionApi } from './api/api';
+  import Card from './Card.svelte';
   import type { Status } from './modules/status-api/status';
   import { mapKeyToEntities } from './store/entities';
 
@@ -146,6 +147,14 @@
       <Button color="primary" on:click={toggleEdit}>
         <Label>섹션 생성하기</Label>
       </Button>
+    {/if}
+
+    {#if section?.comments?.length}
+      <Content>
+        {#each section.comments as id (id)}
+          <Card {id} />
+        {/each}
+      </Content>
     {/if}
   </Paper>
 </div>
