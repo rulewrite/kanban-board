@@ -1,7 +1,7 @@
 import { uniq } from 'lodash-es';
 import { normalize, schema } from 'normalizr';
 import StatusApi from '../modules/status-api/StatusApi';
-import { mergeEntities } from '../store/entities';
+import { mapKeyToEntities, mergeEntities } from '../store/entities';
 
 interface Params {
   // Paginate
@@ -90,6 +90,29 @@ export default class JsonPlaceholder<E extends { id: number }> {
         mergeEntities(entities);
 
         return entity;
+      },
+    });
+  }
+
+  delete(id: E['id'], key: string) {
+    return JsonPlaceholder.statusApi.set<{}>({
+      pathname: `${this.path}/${id}`,
+      params: {},
+      method: 'DELETE',
+      intercepter: (response) => {
+        const entities = mapKeyToEntities[this.schema.key];
+        entities?.delete(id);
+
+        const status = JsonPlaceholder.statusApi.getStatus<Array<E['id']>>(key);
+        if (!status) {
+          return response;
+        }
+
+        status.updateCargo((cargo) => {
+          return cargo.filter((element) => element !== id);
+        });
+
+        return response;
       },
     });
   }

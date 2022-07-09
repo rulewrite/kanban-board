@@ -25,6 +25,7 @@
 
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
+  let deleteUnsubscribe: Unsubscriber;
 
   function toggleEdit() {
     if (isEdit) {
@@ -87,9 +88,16 @@
     updateUnsubscribe = sectionApi.update(id, body).subscribe(postProcess);
   }
 
+  function deleteSection() {
+    deleteUnsubscribe = sectionApi
+      .delete(id, requestKey)
+      .subscribe(postProcess);
+  }
+
   onDestroy(() => {
     createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
+    deleteUnsubscribe && deleteUnsubscribe();
   });
 </script>
 
@@ -113,6 +121,11 @@
         </Textfield>
 
         <Group variant="unelevated">
+          {#if section}
+            <Button on:click={deleteSection} color="secondary">
+              <Label>삭제</Label>
+            </Button>
+          {/if}
           <Button on:click={toggleEdit} color="secondary">
             <Label>취소</Label>
           </Button>

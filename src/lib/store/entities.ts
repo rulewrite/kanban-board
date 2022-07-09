@@ -16,6 +16,13 @@ function createEntities<E>() {
         return merge(state, entities);
       });
     },
+    delete: (id: keyof Entities<E>) => {
+      update((state) => {
+        delete state[id];
+
+        return state;
+      });
+    },
   };
 }
 

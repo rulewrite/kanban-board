@@ -15,7 +15,7 @@
 
 <div class="wrapper">
   {#each $status?.cargo ?? [] as id (id)}
-    <Section {id} bind:editId />
+    <Section {id} bind:editId {requestKey} />
   {/each}
   <Section bind:editId {requestKey} />
 </div>
