@@ -4,6 +4,7 @@
   import type { TextfieldComponentDev } from '@smui/textfield';
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
+  import { fade } from 'svelte/transition';
   import type { Card as CardType } from './api/api';
   import { editCardId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
@@ -14,9 +15,11 @@
 
   let bodyInput: TextfieldComponentDev;
   let body = '';
+  let isHover = false;
 
   $: card = $cards[id];
   $: isEdit = $editCardId === id;
+  $: isShowButtons = isHover || isEdit;
 
   function toggleEdit() {
     if (!isEdit) {
@@ -48,7 +51,11 @@
 </script>
 
 <div class="wrapper">
-  <Card variant="outlined">
+  <Card
+    variant="outlined"
+    on:mouseover={() => (isHover = true)}
+    on:mouseleave={() => (isHover = false)}
+  >
     <Content>
       {#if isEdit}
         <Textfield
@@ -66,20 +73,24 @@
       {/if}
     </Content>
 
-    <Actions>
-      {#if isEdit}
-        <Button on:click={toggleEdit}>
-          <Label>취소</Label>
-        </Button>
-        <Button on:click={update}>
-          <Label>완료</Label>
-        </Button>
-      {:else}
-        <Button on:click={toggleEdit}>
-          <Label>수정</Label>
-        </Button>
-      {/if}
-    </Actions>
+    {#if isShowButtons}
+      <div transition:fade>
+        <Actions>
+          {#if isEdit}
+            <Button on:click={toggleEdit}>
+              <Label>취소</Label>
+            </Button>
+            <Button on:click={update}>
+              <Label>완료</Label>
+            </Button>
+          {:else}
+            <Button on:click={toggleEdit}>
+              <Label>수정</Label>
+            </Button>
+          {/if}
+        </Actions>
+      </div>
+    {/if}
   </Card>
 </div>
 
