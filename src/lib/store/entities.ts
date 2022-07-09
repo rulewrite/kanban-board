@@ -1,6 +1,6 @@
 import { merge } from 'lodash-es';
 import { writable } from 'svelte/store';
-import type { Section } from '../api/api';
+import type { Card, Section } from '../api/api';
 
 interface Entities<E> {
   [id: string]: E;
@@ -27,9 +27,11 @@ function createEntities<E>() {
 }
 
 export const SECTIONS_SCHEMA_KEY = 'sections';
+export const CARDS_SCHEMA_KEY = 'cards';
 
 export const mapKeyToEntities = {
   [SECTIONS_SCHEMA_KEY]: createEntities<Section>(),
+  [CARDS_SCHEMA_KEY]: createEntities<Card>(),
 } as const;
 
 export const mergeEntities = (normalized: {

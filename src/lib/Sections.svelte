@@ -9,7 +9,7 @@
   $: requestKey = $status?.key;
 
   onMount(() => {
-    status = sectionApi.readList({ _page: 1, _limit: 5 });
+    status = sectionApi.readList({ _page: 1, _limit: 5, _embed: 'comments' });
   });
 </script>
 
