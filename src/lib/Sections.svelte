@@ -6,7 +6,7 @@
 
   let status: ReturnType<typeof sectionApi.readList>;
 
-  $: requestKey = $status?.key;
+  $: statusKey = $status?.key;
 
   function getSections() {
     status = sectionApi.readList({
@@ -27,9 +27,9 @@
 
 <div class="wrapper">
   {#each $status?.cargo ?? [] as id (id)}
-    <Section {id} {requestKey} />
+    <Section {id} {statusKey} />
   {/each}
-  <Section {requestKey} />
+  <Section {statusKey} />
 </div>
 
 <style>

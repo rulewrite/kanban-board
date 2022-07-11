@@ -15,7 +15,7 @@
   const sections = mapKeyToEntities.sections;
 
   export let id: Section['id'] = 0;
-  export let requestKey: string = '';
+  export let statusKey: string = '';
 
   let titleInput: TextfieldComponentDev;
   let title = '';
@@ -70,7 +70,7 @@
     }
 
     createUnsubscribe = sectionApi
-      .create({ key: requestKey, body })
+      .create({ key: statusKey, body })
       .subscribe(postProcess);
   }
 
@@ -85,7 +85,7 @@
 
   function deleteSection() {
     deleteUnsubscribe = sectionApi
-      .delete({ id, key: requestKey })
+      .delete({ id, key: statusKey })
       .subscribe(postProcess);
   }
 
