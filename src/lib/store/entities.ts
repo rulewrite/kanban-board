@@ -8,13 +8,13 @@ export interface Entity {
 
 export const isDeleted = Symbol('isDeleted');
 
-interface Entities<E> {
+interface Entities<E extends Entity> {
   [id: string]: E & {
     [isDeleted]?: boolean;
   };
 }
 
-function createEntities<E>() {
+function createEntities<E extends Entity>() {
   const { subscribe, update } = writable<Entities<E>>({});
 
   return {

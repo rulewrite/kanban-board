@@ -54,9 +54,9 @@ function createStatus() {
   };
 }
 
-interface StatusEntity {
+interface StatusEntity<E extends Entity> {
   key: string;
-  id: Entity['id'] | null;
+  id: E['id'] | null;
 }
 export type StatusEntityStore = ReturnType<
   ReturnType<typeof getCreateStatusEntity>
@@ -73,7 +73,7 @@ export function getCreateStatusEntity<E extends Entity>(
       success,
       failure,
     } = createStatus();
-    const { update, subscribe } = writable<StatusEntity>({
+    const { update, subscribe } = writable<StatusEntity<E>>({
       key,
       id: null,
     });
@@ -121,9 +121,9 @@ export function getCreateStatusEntity<E extends Entity>(
   };
 }
 
-interface StatusEntities {
+interface StatusEntities<E extends Entity> {
   key: string;
-  ids: Array<Entity['id']> | null;
+  ids: Array<E['id']> | null;
 }
 export type StatusEntitiesStore = ReturnType<
   ReturnType<typeof getCreateStatusEntities>
@@ -140,7 +140,7 @@ export function getCreateStatusEntities<E extends Entity>(
       success,
       failure,
     } = createStatus();
-    const { update, subscribe } = writable<StatusEntities>({
+    const { update, subscribe } = writable<StatusEntities<E>>({
       key,
       ids: null,
     });
