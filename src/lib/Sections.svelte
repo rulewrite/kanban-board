@@ -26,7 +26,7 @@
 </div>
 
 <div class="wrapper">
-  {#each $status?.cargo ?? [] as id (id)}
+  {#each $status?.ids ?? [] as id (id)}
     <Section {id} {statusKey} />
   {/each}
   <Section {statusKey} />

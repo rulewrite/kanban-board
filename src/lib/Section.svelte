@@ -51,7 +51,7 @@
     };
   }
 
-  function postProcess({ isFetching, failMessage }: Status<number>) {
+  function postProcess({ isFetching, failMessage }: Status) {
     if (isFetching) {
       return;
     }

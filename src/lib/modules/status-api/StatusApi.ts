@@ -1,8 +1,12 @@
-import { uniq } from 'lodash-es';
 import type { schema } from 'normalizr';
 import { get } from 'svelte/store';
 import type { Entity } from '../../store/entities';
-import { getCreateStatus, StatusStore } from './status';
+import {
+  getCreateStatusEntities,
+  getCreateStatusEntity,
+  StatusEntitiesStore,
+  StatusEntityStore,
+} from './status';
 
 export default class StatusApi<P extends Object, E extends Entity> {
   private static paramsToString<P>(params: P) {
@@ -29,16 +33,19 @@ export default class StatusApi<P extends Object, E extends Entity> {
     return `${pathname}${StatusApi.paramsToString(params)}`;
   }
 
-  private mapKeyToStatus = new Map<string, StatusStore>();
+  private mapKeyToStatusEntity = new Map<string, StatusEntityStore>();
+  private mapKeyToStatusEntities = new Map<string, StatusEntitiesStore>();
 
-  private createStatus: ReturnType<typeof getCreateStatus>;
+  private createStatusEntity: ReturnType<typeof getCreateStatusEntity>;
+  private createStatusEntities: ReturnType<typeof getCreateStatusEntities>;
 
   constructor(
     private readonly URL: string,
     schema: schema.Entity<E>,
     private expirationMinutes = 0
   ) {
-    this.createStatus = getCreateStatus<E>(schema);
+    this.createStatusEntity = getCreateStatusEntity<E>(schema);
+    this.createStatusEntities = getCreateStatusEntities<E>(schema);
   }
 
   create({
@@ -51,7 +58,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
     params?: P;
   }) {
     const url = StatusApi.getUrl<P>(this.URL, params);
-    const status = this.createStatus<E['id']>(url);
+    const status = this.createStatusEntity(url);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -65,14 +72,8 @@ export default class StatusApi<P extends Object, E extends Entity> {
     })
       .then<E>((response) => response.json())
       .then((response) => {
-        const result = status.success<E>({
-          ...response,
-          ...body,
-        });
-
-        this.mapKeyToStatus.get(key)?.updateCargo((cargo: Array<E['id']>) => {
-          return uniq([...cargo, result]);
-        });
+        status.success({ ...response, ...body });
+        this.mapKeyToStatusEntities.get(key)?.add(response.id);
       })
       .catch((error: Error) => {
         status.failure(error.message ?? 'Unknown Error');
@@ -84,10 +85,10 @@ export default class StatusApi<P extends Object, E extends Entity> {
   read({ id, params, isForce }: { id: E['id']; params: P; isForce?: boolean }) {
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
 
-    if (!this.mapKeyToStatus.has(url)) {
-      this.mapKeyToStatus.set(url, this.createStatus(url));
+    if (!this.mapKeyToStatusEntity.has(url)) {
+      this.mapKeyToStatusEntity.set(url, this.createStatusEntity(url));
     }
-    const status = this.mapKeyToStatus.get(url) as StatusStore<E['id']>;
+    const status = this.mapKeyToStatusEntity.get(url);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -105,7 +106,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
       fetch(url)
         .then<E>((response) => response.json())
         .then((response) => {
-          status.success<E>(response);
+          status.success(response);
         })
         .catch((error: Error) => {
           status.failure(error.message ?? 'Unknown Error');
@@ -118,10 +119,10 @@ export default class StatusApi<P extends Object, E extends Entity> {
   readList({ params, isForce }: { params: P; isForce?: boolean }) {
     const url = StatusApi.getUrl<P>(this.URL, params);
 
-    if (!this.mapKeyToStatus.has(url)) {
-      this.mapKeyToStatus.set(url, this.createStatus(url));
+    if (!this.mapKeyToStatusEntities.has(url)) {
+      this.mapKeyToStatusEntities.set(url, this.createStatusEntities(url));
     }
-    const status = this.mapKeyToStatus.get(url) as StatusStore<Array<E['id']>>;
+    const status = this.mapKeyToStatusEntities.get(url);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -139,7 +140,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
       fetch(url)
         .then<Array<E>>((response) => response.json())
         .then((response) => {
-          status.success<Array<E>>(response);
+          status.success(response);
         })
         .catch((error: Error) => {
           status.failure(error.message ?? 'Unknown Error');
@@ -151,7 +152,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
   update({ id, body, params }: { id: E['id']; body: Partial<E>; params?: P }) {
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
-    const status = this.createStatus<E['id']>(url);
+    const status = this.createStatusEntity(url);
 
     status.request();
     fetch(url, {
@@ -160,7 +161,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
     })
       .then<E>((response) => response.json())
       .then((response) => {
-        status.success<E>({
+        status.success({
           ...response,
           ...body,
         });
@@ -174,7 +175,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
   delete({ id, key, params }: { id: E['id']; key: string; params?: P }) {
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
-    const status = this.createStatus<E['id']>(url);
+    const status = this.createStatusEntity(url);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -187,11 +188,8 @@ export default class StatusApi<P extends Object, E extends Entity> {
     })
       .then<{}>((response) => response.json())
       .then(() => {
-        status.successDelete(id);
-
-        this.mapKeyToStatus.get(key)?.updateCargo((cargo: Array<E['id']>) => {
-          return cargo.filter((element) => element !== id);
-        });
+        status.success({ id });
+        this.mapKeyToStatusEntities.get(key)?.delete(id);
       })
       .catch((error: Error) => {
         status.failure(error.message ?? 'Unknown Error');
