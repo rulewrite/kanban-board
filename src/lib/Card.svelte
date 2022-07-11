@@ -7,9 +7,9 @@
   import { uniqueId } from 'lodash-es';
   import { fade } from 'svelte/transition';
   import { Card as CardType, cardApi } from './api/jsonPlaceholder';
-  import type { Status } from './modules/status-api/status';
   import { editCardId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
+  import type { Status } from './store/status';
 
   const cards = mapKeyToEntities.cards;
 

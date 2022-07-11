@@ -9,9 +9,9 @@
   import type { Unsubscriber } from 'svelte/store';
   import { Section, sectionApi } from './api/jsonPlaceholder';
   import Card from './Card.svelte';
-  import type { Status } from './modules/status-api/status';
   import { editSectionId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
+  import type { Status } from './store/status';
 
   const sections = mapKeyToEntities.sections;
 

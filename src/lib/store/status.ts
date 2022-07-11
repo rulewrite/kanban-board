@@ -7,7 +7,7 @@ import {
   isDeleted,
   mapKeyToEntities,
   mergeEntities,
-} from '../../store/entities';
+} from './entities';
 
 export interface Status {
   isFetching: boolean;

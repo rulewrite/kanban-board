@@ -1,6 +1,6 @@
 import { schema } from 'normalizr';
-import StatusApi from '../modules/status-api/StatusApi';
 import { CARDS_SCHEMA_KEY, SECTIONS_SCHEMA_KEY } from '../store/entities';
+import StatusApi from './StatusApi';
 
 interface Params {
   // Paginate

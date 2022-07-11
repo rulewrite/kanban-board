@@ -1,12 +1,12 @@
 import type { schema } from 'normalizr';
 import { get } from 'svelte/store';
-import type { Entity } from '../../store/entities';
+import type { Entity } from '../store/entities';
 import {
   getCreateStatusEntities,
   getCreateStatusEntity,
   StatusEntitiesStore,
   StatusEntityStore,
-} from './status';
+} from '../store/status';
 
 export default class StatusApi<P extends Object, E extends Entity> {
   private static paramsToString<P>(params: P) {
