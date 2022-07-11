@@ -25,6 +25,27 @@ export default class StatusApi<P extends Object> {
     return `${this.URL}/${pathname}${StatusApi.paramsToString(params)}`;
   }
 
+  private async request<R, C = R>({
+    status,
+    fetch,
+    intercepter,
+  }: {
+    status: ReturnType<typeof createStatus>;
+    fetch: Promise<Response>;
+    intercepter?: (response: R) => C;
+  }) {
+    try {
+      status.request();
+
+      const response: R = await (await fetch).json();
+      status.success(
+        intercepter ? intercepter(response) : (response as unknown as C)
+      );
+    } catch (error) {
+      status.failure(error instanceof Error ? error.message : 'Unknown Error');
+    }
+  }
+
   getStatus<C>(key: string) {
     return (this.mapKeyToStatus.get(key) as StatusStore<C>) ?? null;
   }
@@ -45,17 +66,7 @@ export default class StatusApi<P extends Object> {
     }
     const status = this.mapKeyToStatus.get(url) as StatusStore<C>;
 
-    status.request();
-    fetch(url)
-      .then<R>((response) => response.json())
-      .then((response) => {
-        status.success(
-          intercepter ? intercepter(response) : (response as unknown as C)
-        );
-      })
-      .catch((error: Error) => {
-        status.failure(error.message ?? 'Unknown Error');
-      });
+    this.request<R, C>({ status, fetch: fetch(url), intercepter });
 
     return status;
   }
@@ -76,20 +87,14 @@ export default class StatusApi<P extends Object> {
     const url = this.getUrl(pathname, params);
     const status = createStatus<C>(url);
 
-    status.request();
-    fetch(url, {
-      method,
-      body: JSON.stringify(body),
-    })
-      .then<R>((response) => response.json())
-      .then((response) => {
-        status.success(
-          intercepter ? intercepter(response) : (response as unknown as C)
-        );
-      })
-      .catch((error: Error) => {
-        status.failure(error.message ?? 'Unknown Error');
-      });
+    this.request<R, C>({
+      status,
+      fetch: fetch(url, {
+        method,
+        body: JSON.stringify(body),
+      }),
+      intercepter,
+    });
 
     return status;
   }
