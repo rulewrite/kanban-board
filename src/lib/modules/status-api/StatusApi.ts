@@ -1,3 +1,4 @@
+import { get } from 'svelte/store';
 import { createStatus, StatusStore } from './status';
 
 export default class StatusApi<P extends Object> {
@@ -66,6 +67,11 @@ export default class StatusApi<P extends Object> {
     }
     const status = this.mapKeyToStatus.get(url) as StatusStore<C>;
 
+    const $status = get(status);
+    if ($status.isFetching) {
+      return status;
+    }
+
     this.request<R, C>({ status, fetch: fetch(url), intercepter });
 
     return status;
@@ -86,6 +92,11 @@ export default class StatusApi<P extends Object> {
   }) {
     const url = this.getUrl(pathname, params);
     const status = createStatus<C>(url);
+
+    const $status = get(status);
+    if (method !== 'PATCH' && $status.isFetching) {
+      return status;
+    }
 
     this.request<R, C>({
       status,
