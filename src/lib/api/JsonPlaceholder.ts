@@ -21,7 +21,11 @@ export default class JsonPlaceholder<E extends { id: number }> {
     'https://jsonplaceholder.typicode.com'
   );
 
-  constructor(private path: string, private schema: schema.Entity<E>) {}
+  constructor(
+    private path: string,
+    private schema: schema.Entity<E>,
+    private expirationMinutes = 0
+  ) {}
 
   create(body: Omit<E, 'id'>, key: string) {
     return JsonPlaceholder.statusApi.set<Pick<E, 'id'>, E>({
@@ -49,10 +53,12 @@ export default class JsonPlaceholder<E extends { id: number }> {
     });
   }
 
-  read(id: E['id'], params: Params) {
+  read(id: E['id'], params: Params, isForce?: boolean) {
     return JsonPlaceholder.statusApi.get<E, E['id']>({
       pathname: `${this.path}/${id}`,
       params,
+      expirationMinutes: this.expirationMinutes,
+      isForce,
       intercepter: (response) => {
         const { entities, result } = normalize(response, this.schema);
 
@@ -63,10 +69,12 @@ export default class JsonPlaceholder<E extends { id: number }> {
     });
   }
 
-  readList(params: Params) {
+  readList(params: Params, isForce?: boolean) {
     return JsonPlaceholder.statusApi.get<Array<E>, Array<E['id']>>({
       pathname: this.path,
       params,
+      expirationMinutes: this.expirationMinutes,
+      isForce,
       intercepter: (response) => {
         const { entities, result } = normalize(response, [this.schema]);
 

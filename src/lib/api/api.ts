@@ -23,5 +23,6 @@ export const sectionApi = new JsonPlaceholder<Section>(
   'posts',
   new schema.Entity<Section>(SECTIONS_SCHEMA_KEY, {
     comments: [cardSchema],
-  })
+  }),
+  1
 );

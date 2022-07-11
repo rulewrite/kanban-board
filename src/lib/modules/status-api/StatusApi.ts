@@ -18,6 +18,10 @@ export default class StatusApi<P extends Object> {
     return `?${pairs.join('&')}`;
   }
 
+  private static minutesToMs(minutes: number) {
+    return minutes * 60 * 1000;
+  }
+
   private mapKeyToStatus = new Map<string, ReturnType<typeof createStatus>>();
 
   constructor(private readonly URL: string) {}
@@ -54,10 +58,14 @@ export default class StatusApi<P extends Object> {
   get<R, C = R>({
     pathname,
     params,
+    expirationMinutes,
+    isForce,
     intercepter,
   }: {
     pathname: string;
     params: P;
+    expirationMinutes?: number;
+    isForce?: boolean;
     intercepter?: (response: R) => C;
   }) {
     const url = this.getUrl(pathname, params);
@@ -72,7 +80,14 @@ export default class StatusApi<P extends Object> {
       return status;
     }
 
-    this.request<R, C>({ status, fetch: fetch(url), intercepter });
+    if (
+      isForce ||
+      !expirationMinutes ||
+      !$status.receivedAt ||
+      Date.now() - $status.receivedAt > StatusApi.minutesToMs(expirationMinutes)
+    ) {
+      this.request<R, C>({ status, fetch: fetch(url), intercepter });
+    }
 
     return status;
   }
