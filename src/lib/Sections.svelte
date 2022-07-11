@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button, { Group } from '@smui/button';
   import { onMount } from 'svelte';
-  import { sectionApi } from './api/api';
+  import { sectionApi } from './api/jsonPlaceholder';
   import Section from './Section.svelte';
 
   let status: ReturnType<typeof sectionApi.readList>;

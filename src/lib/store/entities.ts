@@ -1,6 +1,6 @@
 import { merge } from 'lodash-es';
 import { writable } from 'svelte/store';
-import type { Card, Section } from '../api/api';
+import type { Card, Section } from '../api/jsonPlaceholder';
 
 interface Entities<E> {
   [id: string]: E;

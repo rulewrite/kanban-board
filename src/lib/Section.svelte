@@ -6,7 +6,7 @@
   import HelperText from '@smui/textfield/helper-text';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { Section, sectionApi } from './api/api';
+  import { Section, sectionApi } from './api/jsonPlaceholder';
   import Card from './Card.svelte';
   import type { Status } from './modules/status-api/status';
   import { editSectionId } from './store/editId';

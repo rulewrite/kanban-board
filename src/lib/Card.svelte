@@ -5,7 +5,7 @@
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
   import { fade } from 'svelte/transition';
-  import { Card as CardType, cardApi } from './api/api';
+  import { Card as CardType, cardApi } from './api/jsonPlaceholder';
   import type { Status } from './modules/status-api/status';
   import { editCardId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
