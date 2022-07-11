@@ -9,7 +9,9 @@
   $: requestKey = $status?.key;
 
   function getSections() {
-    status = sectionApi.readList({ _page: 1, _limit: 5, _embed: 'comments' });
+    status = sectionApi.readList({
+      params: { _page: 1, _limit: 5, _embed: 'comments' },
+    });
   }
 
   onMount(() => {

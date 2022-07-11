@@ -1,6 +1,8 @@
 import { Readable, writable } from 'svelte/store';
 
-export interface Status<C> {
+export type Cargo = Array<number> | number;
+
+export interface Status<C extends Cargo> {
   key: string;
   isFetching: boolean;
   receivedAt: number;
@@ -9,7 +11,7 @@ export interface Status<C> {
 }
 
 // type StatusStore<C> = ReturnType<typeof createStatus<C>>;
-export interface StatusStore<C> {
+export interface StatusStore<C extends Cargo> {
   subscribe: Readable<Status<C>>['subscribe'];
   request: () => void;
   success: (cargo: Status<C>['cargo']) => void;
@@ -17,7 +19,7 @@ export interface StatusStore<C> {
   updateCargo: (updater: (cargo: C) => C) => void;
 }
 
-export function createStatus<C>(key: string): StatusStore<C> {
+export function createStatus<C extends Cargo>(key: string): StatusStore<C> {
   const { subscribe, update } = writable<Status<C>>({
     key,
     isFetching: false,

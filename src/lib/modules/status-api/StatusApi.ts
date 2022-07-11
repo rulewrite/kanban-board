@@ -1,7 +1,10 @@
+import { uniq } from 'lodash-es';
+import { normalize, schema } from 'normalizr';
 import { get } from 'svelte/store';
-import { createStatus, StatusStore } from './status';
+import { mapKeyToEntities, mergeEntities } from '../../store/entities';
+import { Cargo, createStatus, StatusStore } from './status';
 
-export default class StatusApi<P extends Object> {
+export default class StatusApi<P extends Object, E extends { id: number }> {
   private static paramsToString<P>(params: P) {
     if (!params) {
       return '';
@@ -22,58 +25,75 @@ export default class StatusApi<P extends Object> {
     return minutes * 60 * 1000;
   }
 
+  private static getUrl<P>(pathname: string, params: P) {
+    return `${pathname}${StatusApi.paramsToString(params)}`;
+  }
+
   private mapKeyToStatus = new Map<string, ReturnType<typeof createStatus>>();
 
-  constructor(private readonly URL: string) {}
+  constructor(
+    private readonly URL: string,
+    private readonly schema: schema.Entity<E>,
+    private expirationMinutes = 0
+  ) {}
 
-  private getUrl(pathname: string, params: P) {
-    return `${this.URL}/${pathname}${StatusApi.paramsToString(params)}`;
+  private mergeEntities<R, C extends Cargo>(response: R) {
+    const { entities, result } = normalize(
+      response,
+      Array.isArray(response) ? [this.schema] : this.schema
+    );
+
+    mergeEntities(entities);
+
+    return result as C;
   }
 
-  private async request<R, C = R>({
-    status,
-    fetch,
-    intercepter,
-  }: {
-    status: ReturnType<typeof createStatus>;
-    fetch: Promise<Response>;
-    intercepter?: (response: R) => C;
-  }) {
-    try {
-      status.request();
-
-      const response: R = await (await fetch).json();
-      status.success(
-        intercepter ? intercepter(response) : (response as unknown as C)
-      );
-    } catch (error) {
-      status.failure(error instanceof Error ? error.message : 'Unknown Error');
-    }
-  }
-
-  getStatus<C>(key: string) {
-    return (this.mapKeyToStatus.get(key) as StatusStore<C>) ?? null;
-  }
-
-  get<R, C = R>({
-    pathname,
+  create({
+    key,
+    body,
     params,
-    expirationMinutes,
-    isForce,
-    intercepter,
   }: {
-    pathname: string;
-    params: P;
-    expirationMinutes?: number;
-    isForce?: boolean;
-    intercepter?: (response: R) => C;
+    key: string;
+    body: Omit<E, 'id'>;
+    params?: P;
   }) {
-    const url = this.getUrl(pathname, params);
+    const url = StatusApi.getUrl<P>(this.URL, params);
+    const status = createStatus<E['id']>(url);
+
+    const $status = get(status);
+    if ($status.isFetching) {
+      return status;
+    }
+
+    status.request();
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+      .then<E>((response) => response.json())
+      .then((response) => {
+        const result = this.mergeEntities<E, E['id']>({ ...response, ...body });
+
+        status.success(result);
+
+        this.mapKeyToStatus.get(key)?.updateCargo((cargo: Array<number>) => {
+          return uniq([...cargo, result]);
+        });
+      })
+      .catch((error: Error) => {
+        status.failure(error.message ?? 'Unknown Error');
+      });
+
+    return status;
+  }
+
+  read({ id, params, isForce }: { id: E['id']; params: P; isForce?: boolean }) {
+    const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
 
     if (!this.mapKeyToStatus.has(url)) {
-      this.mapKeyToStatus.set(url, createStatus<C>(url));
+      this.mapKeyToStatus.set(url, createStatus(url));
     }
-    const status = this.mapKeyToStatus.get(url) as StatusStore<C>;
+    const status = this.mapKeyToStatus.get(url) as StatusStore<E['id']>;
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -82,45 +102,113 @@ export default class StatusApi<P extends Object> {
 
     if (
       isForce ||
-      !expirationMinutes ||
+      !this.expirationMinutes ||
       !$status.receivedAt ||
-      Date.now() - $status.receivedAt > StatusApi.minutesToMs(expirationMinutes)
+      Date.now() - $status.receivedAt >
+        StatusApi.minutesToMs(this.expirationMinutes)
     ) {
-      this.request<R, C>({ status, fetch: fetch(url), intercepter });
+      status.request();
+      fetch(url)
+        .then<E>((response) => response.json())
+        .then((response) => {
+          status.success(this.mergeEntities<E, E['id']>(response));
+        })
+        .catch((error: Error) => {
+          status.failure(error.message ?? 'Unknown Error');
+        });
     }
 
     return status;
   }
 
-  set<R, C = R>({
-    pathname,
-    params,
-    method,
-    body,
-    intercepter,
-  }: {
-    pathname: string;
-    params: P;
-    method: 'POST' | 'PATCH' | 'DELETE';
-    body?: Partial<R>;
-    intercepter?: (response: R) => C;
-  }) {
-    const url = this.getUrl(pathname, params);
-    const status = createStatus<C>(url);
+  readList({ params, isForce }: { params: P; isForce?: boolean }) {
+    const url = StatusApi.getUrl<P>(this.URL, params);
+
+    if (!this.mapKeyToStatus.has(url)) {
+      this.mapKeyToStatus.set(url, createStatus(url));
+    }
+    const status = this.mapKeyToStatus.get(url) as StatusStore<Array<E['id']>>;
 
     const $status = get(status);
-    if (method !== 'PATCH' && $status.isFetching) {
+    if ($status.isFetching) {
       return status;
     }
 
-    this.request<R, C>({
-      status,
-      fetch: fetch(url, {
-        method,
-        body: JSON.stringify(body),
-      }),
-      intercepter,
-    });
+    if (
+      isForce ||
+      !this.expirationMinutes ||
+      !$status.receivedAt ||
+      Date.now() - $status.receivedAt >
+        StatusApi.minutesToMs(this.expirationMinutes)
+    ) {
+      status.request();
+      fetch(url)
+        .then<Array<E>>((response) => response.json())
+        .then((response) => {
+          status.success(
+            this.mergeEntities<Array<E>, Array<E['id']>>(response)
+          );
+        })
+        .catch((error: Error) => {
+          status.failure(error.message ?? 'Unknown Error');
+        });
+    }
+
+    return status;
+  }
+
+  update({ id, body, params }: { id: E['id']; body: Partial<E>; params?: P }) {
+    const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
+    const status = createStatus<E['id']>(url);
+
+    status.request();
+    fetch(url, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    })
+      .then<E>((response) => response.json())
+      .then((response) => {
+        status.success(
+          this.mergeEntities<E, E['id']>({
+            ...response,
+            ...body,
+          })
+        );
+      })
+      .catch((error: Error) => {
+        status.failure(error.message ?? 'Unknown Error');
+      });
+
+    return status;
+  }
+
+  delete({ id, key, params }: { id: number; key: string; params?: P }) {
+    const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
+    const status = createStatus<E['id']>(url);
+
+    const $status = get(status);
+    if ($status.isFetching) {
+      return status;
+    }
+
+    status.request();
+    fetch(url, {
+      method: 'DELETE',
+    })
+      .then<{}>((response) => response.json())
+      .then(() => {
+        status.success(id);
+
+        const entities = mapKeyToEntities[this.schema.key];
+        entities?.delete(id);
+
+        this.mapKeyToStatus.get(key)?.updateCargo((cargo: Array<E['id']>) => {
+          return cargo.filter((element) => element !== id);
+        });
+      })
+      .catch((error: Error) => {
+        status.failure(error.message ?? 'Unknown Error');
+      });
 
     return status;
   }

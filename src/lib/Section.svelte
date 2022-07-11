@@ -51,7 +51,7 @@
     };
   }
 
-  function postProcess({ isFetching, failMessage }: Status<unknown>) {
+  function postProcess({ isFetching, failMessage }: Status<number>) {
     if (isFetching) {
       return;
     }
@@ -70,7 +70,7 @@
     }
 
     createUnsubscribe = sectionApi
-      .create(body, requestKey)
+      .create({ key: requestKey, body })
       .subscribe(postProcess);
   }
 
@@ -80,12 +80,12 @@
       return;
     }
 
-    updateUnsubscribe = sectionApi.update(id, body).subscribe(postProcess);
+    updateUnsubscribe = sectionApi.update({ id, body }).subscribe(postProcess);
   }
 
   function deleteSection() {
     deleteUnsubscribe = sectionApi
-      .delete(id, requestKey)
+      .delete({ id, key: requestKey })
       .subscribe(postProcess);
   }
 

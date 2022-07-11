@@ -43,7 +43,7 @@
     };
   }
 
-  function postProcess({ isFetching, failMessage }: Status<unknown>) {
+  function postProcess({ isFetching, failMessage }: Status<number>) {
     if (isFetching) {
       return;
     }
@@ -61,7 +61,7 @@
       return;
     }
 
-    cardApi.update(id, body).subscribe(postProcess);
+    cardApi.update({ id, body }).subscribe(postProcess);
   }
 </script>
 
