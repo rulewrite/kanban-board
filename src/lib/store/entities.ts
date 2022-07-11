@@ -2,6 +2,10 @@ import { merge } from 'lodash-es';
 import { writable } from 'svelte/store';
 import type { Card, Section } from '../api/jsonPlaceholder';
 
+export interface Entity {
+  id: number;
+}
+
 interface Entities<E> {
   [id: string]: E;
 }
