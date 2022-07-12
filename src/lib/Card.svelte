@@ -4,7 +4,7 @@
   import type { TextfieldComponentDev } from '@smui/textfield';
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
-  import { uniq, uniqueId } from 'lodash-es';
+  import { uniq, uniqueId, without } from 'lodash-es';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { fade } from 'svelte/transition';
@@ -71,6 +71,19 @@
           return;
         }
 
+        sections.update((sectionEntities) => {
+          Object.values(sectionEntities).forEach((sectionEntity) => {
+            if (!sectionEntity.comments.includes(id)) {
+              return;
+            }
+
+            sectionEntities[sectionEntity.id].comments = without(
+              sectionEntity.comments,
+              id
+            );
+          });
+          return sectionEntities;
+        });
         sections.updateProperty(sectionId, ({ comments, ...section }) => {
           return { ...section, comments: uniq([...comments, id]) };
         });
