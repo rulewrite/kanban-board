@@ -4,6 +4,7 @@
   import type { TextfieldComponentDev } from '@smui/textfield';
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
+  import { uniqueId } from 'lodash-es';
   import { fade } from 'svelte/transition';
   import { Card as CardType, cardApi } from './api/jsonPlaceholder';
   import type { Status } from './modules/status-api/status';
@@ -12,14 +13,15 @@
 
   const cards = mapKeyToEntities.cards;
 
-  export let id: CardType['id'] = 0;
+  export let id: CardType['id'] = null;
 
   let bodyInput: TextfieldComponentDev;
   let body = '';
   let isHover = false;
 
   $: card = $cards[id];
-  $: isEdit = $editCardId === id;
+  $: editId = String(id ?? uniqueId('create_card_'));
+  $: isEdit = $editCardId === editId;
   $: isShowButtons = isHover || isEdit;
 
   function toggleEdit() {
@@ -27,7 +29,7 @@
       body = card?.body ?? '';
     }
 
-    editCardId.toggle(id);
+    editCardId.toggle(editId);
   }
 
   function validate() {
@@ -52,7 +54,7 @@
       return;
     }
 
-    editCardId.off(id);
+    editCardId.off(editId);
   }
 
   function update() {

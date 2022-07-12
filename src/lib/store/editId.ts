@@ -1,26 +1,27 @@
 import { writable } from 'svelte/store';
 
-function createEditId(id = NaN) {
-  const { subscribe, update } = writable<number>(id);
+function createEditId(id?: string) {
+  const emptyId = Symbol();
+  const { subscribe, update } = writable<string | Symbol>(id ?? emptyId);
 
   return {
     subscribe,
-    toggle: (id: number) => {
+    toggle: (id: string) => {
       update((currentId) => {
         if (id === currentId) {
-          return NaN;
+          return emptyId;
         }
 
         return id;
       });
     },
-    off: (id: number) => {
+    off: (id: string) => {
       update((currentId) => {
         if (id !== currentId) {
           return currentId;
         }
 
-        return NaN;
+        return emptyId;
       });
     },
   };

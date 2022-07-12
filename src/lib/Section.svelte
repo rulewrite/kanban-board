@@ -4,6 +4,7 @@
   import type { TextfieldComponentDev } from '@smui/textfield';
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
+  import { uniqueId } from 'lodash-es';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { Section, sectionApi } from './api/jsonPlaceholder';
@@ -14,7 +15,7 @@
 
   const sections = mapKeyToEntities.sections;
 
-  export let id: Section['id'] = 0;
+  export let id: Section['id'] = null;
   export let statusKey: string = '';
 
   let titleInput: TextfieldComponentDev;
@@ -22,7 +23,8 @@
   let body = '';
 
   $: section = $sections[id];
-  $: isEdit = $editSectionId === id;
+  $: editId = String(id ?? uniqueId('create_section_'));
+  $: isEdit = $editSectionId === editId;
 
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
@@ -34,7 +36,7 @@
       body = section?.body ?? '';
     }
 
-    editSectionId.toggle(id);
+    editSectionId.toggle(editId);
   }
 
   function validate() {
@@ -60,7 +62,7 @@
       return;
     }
 
-    editSectionId.off(id);
+    editSectionId.off(editId);
   }
 
   function create() {
