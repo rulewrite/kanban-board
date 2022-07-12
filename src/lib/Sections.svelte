@@ -39,7 +39,9 @@
 </div>
 
 <div class="wrapper">
-  {#each ids as id (id)}
+  <!-- TODO: keyed each 시 카드 수정 활성화 상태에서 섹션 제거하면 섹션 렌더링이 제거되지 않는 이슈 -->
+  <!-- {#each ids as id (id)} -->
+  {#each ids as id}
     <Section {id} />
   {/each}
   <Section bind:createdId />
