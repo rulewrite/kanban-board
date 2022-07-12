@@ -4,7 +4,6 @@ import { derived, writable } from 'svelte/store';
 import {
   EntitiesKeys,
   Entity,
-  isDeleted,
   mapKeyToEntities,
   mergeEntities,
 } from './entities';
@@ -80,16 +79,11 @@ export function getCreateStatusEntity<E extends Entity>(
 
     return {
       ...derived(
-        [
-          { subscribe: statusSubscribe },
-          { subscribe },
-          { subscribe: entitiesStore.subscribe },
-        ],
-        ([$status, { id, ...$store }, $entities]) => {
+        [{ subscribe: statusSubscribe }, { subscribe }],
+        ([$status, $store]) => {
           return {
             ...$status,
             ...$store,
-            id: $entities[id]?.[isDeleted] ? null : id,
           };
         }
       ),
@@ -131,8 +125,6 @@ export type StatusEntitiesStore = ReturnType<
 export function getCreateStatusEntities<E extends Entity>(
   schema: schema.Entity<E>
 ) {
-  const entitiesStore = mapKeyToEntities[schema.key as EntitiesKeys];
-
   return (key: string) => {
     const {
       subscribe: statusSubscribe,
@@ -147,16 +139,11 @@ export function getCreateStatusEntities<E extends Entity>(
 
     return {
       ...derived(
-        [
-          { subscribe: statusSubscribe },
-          { subscribe },
-          { subscribe: entitiesStore.subscribe },
-        ],
-        ([$status, { ids, ...$store }, $entities]) => {
+        [{ subscribe: statusSubscribe }, { subscribe }],
+        ([$status, $store]) => {
           return {
             ...$status,
             ...$store,
-            ids: (ids ?? []).filter((id) => !$entities[id][isDeleted]),
           };
         }
       ),

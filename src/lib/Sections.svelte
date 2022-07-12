@@ -3,9 +3,17 @@
   import { beforeUpdate, onMount } from 'svelte';
   import { sectionApi } from './api/jsonPlaceholder';
   import Section from './Section.svelte';
+  import { isDeleted, mapKeyToEntities } from './store/entities';
+
+  const sections = mapKeyToEntities.sections;
 
   let status: ReturnType<typeof sectionApi.readList>;
   let createdId: number;
+
+  $: sectionEntities = $sections;
+  $: ids = ($status?.ids ?? []).filter(
+    (id) => !sectionEntities[id]?.[isDeleted]
+  );
 
   function getSections() {
     status = sectionApi.readList({
@@ -31,7 +39,7 @@
 </div>
 
 <div class="wrapper">
-  {#each $status?.ids ?? [] as id (id)}
+  {#each ids as id (id)}
     <Section {id} />
   {/each}
   <Section bind:createdId />
