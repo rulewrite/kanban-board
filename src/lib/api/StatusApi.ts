@@ -48,15 +48,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
     this.createStatusEntities = getCreateStatusEntities<E>(schema);
   }
 
-  create({
-    key,
-    body,
-    params,
-  }: {
-    key: string;
-    body: Omit<E, 'id'>;
-    params?: P;
-  }) {
+  create({ body, params }: { body: Omit<E, 'id'>; params?: P }) {
     const url = StatusApi.getUrl<P>(this.URL, params);
 
     if (!this.mapKeyToStatusEntity.has(url)) {
@@ -77,7 +69,6 @@ export default class StatusApi<P extends Object, E extends Entity> {
       .then<E>((response) => response.json())
       .then((response) => {
         status.success({ ...response, ...body });
-        this.mapKeyToStatusEntities.get(key)?.add(response.id);
       })
       .catch((error: Error) => {
         status.failure(error.message ?? 'Unknown Error');

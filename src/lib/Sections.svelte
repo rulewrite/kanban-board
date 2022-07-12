@@ -1,12 +1,11 @@
 <script lang="ts">
   import Button, { Group } from '@smui/button';
-  import { onMount } from 'svelte';
+  import { beforeUpdate, onMount } from 'svelte';
   import { sectionApi } from './api/jsonPlaceholder';
   import Section from './Section.svelte';
 
   let status: ReturnType<typeof sectionApi.readList>;
-
-  $: statusKey = $status?.key;
+  let createdId: number;
 
   function getSections() {
     status = sectionApi.readList({
@@ -16,6 +15,12 @@
 
   onMount(() => {
     getSections();
+  });
+
+  beforeUpdate(() => {
+    if (createdId) {
+      status?.push(createdId);
+    }
   });
 </script>
 
@@ -27,9 +32,9 @@
 
 <div class="wrapper">
   {#each $status?.ids ?? [] as id (id)}
-    <Section {id} {statusKey} />
+    <Section {id} />
   {/each}
-  <Section {statusKey} />
+  <Section bind:createdId />
 </div>
 
 <style>

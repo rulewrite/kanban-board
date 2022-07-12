@@ -174,7 +174,7 @@ export function getCreateStatusEntities<E extends Entity>(
         });
         success();
       },
-      add: (id: E['id']) => {
+      push: (id: E['id']) => {
         update(({ ids, ...store }) => {
           return {
             ...store,

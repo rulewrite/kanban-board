@@ -11,12 +11,11 @@
   import Card from './Card.svelte';
   import { editSectionId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
-  import type { Status } from './store/status';
 
   const sections = mapKeyToEntities.sections;
 
   export let id: Section['id'] = null;
-  export let statusKey: string = '';
+  export let createdId = NaN;
 
   let titleInput: TextfieldComponentDev;
   let title = '';
@@ -53,18 +52,6 @@
     };
   }
 
-  function postProcess({ isFetching, failMessage }: Status) {
-    if (isFetching) {
-      return;
-    }
-
-    if (failMessage) {
-      return;
-    }
-
-    editSectionId.off(editId);
-  }
-
   function create() {
     const body = validate();
     if (!body) {
@@ -72,8 +59,19 @@
     }
 
     createUnsubscribe = sectionApi
-      .create({ key: statusKey, body })
-      .subscribe(postProcess);
+      .create({ body })
+      .subscribe(({ isFetching, failMessage, id }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+
+        createdId = id;
+        editSectionId.off(editId);
+      });
   }
 
   function update() {
@@ -82,11 +80,35 @@
       return;
     }
 
-    updateUnsubscribe = sectionApi.update({ id, body }).subscribe(postProcess);
+    updateUnsubscribe = sectionApi
+      .update({ id, body })
+      .subscribe(({ isFetching, failMessage }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+
+        editSectionId.off(editId);
+      });
   }
 
   function deleteSection() {
-    deleteUnsubscribe = sectionApi.delete({ id }).subscribe(postProcess);
+    deleteUnsubscribe = sectionApi
+      .delete({ id })
+      .subscribe(({ isFetching, failMessage }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+
+        editSectionId.off(editId);
+      });
   }
 
   onDestroy(() => {
