@@ -58,7 +58,11 @@ export default class StatusApi<P extends Object, E extends Entity> {
     params?: P;
   }) {
     const url = StatusApi.getUrl<P>(this.URL, params);
-    const status = this.createStatusEntity(url);
+
+    if (!this.mapKeyToStatusEntity.has(url)) {
+      this.mapKeyToStatusEntity.set(url, this.createStatusEntity(url));
+    }
+    const status = this.mapKeyToStatusEntity.get(url);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -152,7 +156,16 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
   update({ id, body, params }: { id: E['id']; body: Partial<E>; params?: P }) {
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
-    const status = this.createStatusEntity(url);
+
+    if (!this.mapKeyToStatusEntity.has(url)) {
+      this.mapKeyToStatusEntity.set(url, this.createStatusEntity(url));
+    }
+    const status = this.mapKeyToStatusEntity.get(url);
+
+    const $status = get(status);
+    if ($status.isFetching) {
+      return status;
+    }
 
     status.request();
     fetch(url, {
@@ -175,7 +188,11 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
   delete({ id, params }: { id: E['id']; params?: P }) {
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
-    const status = this.createStatusEntity(url);
+
+    if (!this.mapKeyToStatusEntity.has(url)) {
+      this.mapKeyToStatusEntity.set(url, this.createStatusEntity(url));
+    }
+    const status = this.mapKeyToStatusEntity.get(url);
 
     const $status = get(status);
     if ($status.isFetching) {
