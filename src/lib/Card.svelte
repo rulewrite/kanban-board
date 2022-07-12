@@ -11,7 +11,6 @@
   import { Card as CardType, cardApi } from './api/jsonPlaceholder';
   import { editCardId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
-  import type { Status } from './store/status';
 
   const cards = mapKeyToEntities.cards;
 
@@ -24,7 +23,7 @@
   $: card = $cards[id];
   $: editId = String(id ?? uniqueId('create_card_'));
   $: isEdit = $editCardId === editId;
-  $: isShowButtons = isHover || isEdit;
+  $: isShowButtons = (card && isHover) || isEdit;
 
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
@@ -51,17 +50,7 @@
     };
   }
 
-  function postProcess({ isFetching, failMessage }: Status) {
-    if (isFetching) {
-      return;
-    }
-
-    if (failMessage) {
-      return;
-    }
-
-    editCardId.off(editId);
-  }
+  function create() {}
 
   function update() {
     const body = validate();
@@ -69,7 +58,19 @@
       return;
     }
 
-    updateUnsubscribe = cardApi.update({ id, body }).subscribe(postProcess);
+    updateUnsubscribe = cardApi
+      .update({ id, body })
+      .subscribe(({ isFetching, failMessage }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+
+        editCardId.off(editId);
+      });
   }
 
   onDestroy(() => {
@@ -85,8 +86,8 @@
     on:mouseover={() => (isHover = true)}
     on:mouseleave={() => (isHover = false)}
   >
-    <Content>
-      {#if isEdit}
+    {#if isEdit}
+      <Content>
         <Textfield
           bind:this={bodyInput}
           bind:value={body}
@@ -97,10 +98,12 @@
             내용을 올바르게 입력해주세요.
           </HelperText>
         </Textfield>
-      {:else}
+      </Content>
+    {:else if card}
+      <Content>
         {card.body}
-      {/if}
-    </Content>
+      </Content>
+    {/if}
 
     {#if isShowButtons}
       <div transition:fade>
@@ -109,8 +112,8 @@
             <Button on:click={toggleEdit}>
               <Label>취소</Label>
             </Button>
-            <Button on:click={update}>
-              <Label>완료</Label>
+            <Button on:click={card ? update : create}>
+              <Label>{card ? '완료' : '생성'}</Label>
             </Button>
           {:else}
             <Button on:click={toggleEdit}>
@@ -119,6 +122,14 @@
           {/if}
         </Actions>
       </div>
+    {/if}
+
+    {#if !isEdit && !card}
+      <Actions>
+        <Button color="primary" on:click={toggleEdit}>
+          <Label>카드 생성하기</Label>
+        </Button>
+      </Actions>
     {/if}
   </Card>
 </div>

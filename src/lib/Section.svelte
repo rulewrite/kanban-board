@@ -165,12 +165,15 @@
       </Button>
     {/if}
 
-    {#if section?.comments?.length}
-      <Content>
-        {#each section.comments as id (id)}
-          <Card {id} />
-        {/each}
-      </Content>
+    {#if section}
+      {#if section?.comments?.length}
+        <Content>
+          {#each section.comments as id (id)}
+            <Card {id} />
+          {/each}
+        </Content>
+      {/if}
+      <Card />
     {/if}
   </Paper>
 </div>

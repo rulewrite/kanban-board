@@ -9,7 +9,7 @@ import {
   mergeEntities,
 } from './entities';
 
-export interface Status {
+interface Status {
   isFetching: boolean;
   receivedAt: number;
   failMessage: string;
