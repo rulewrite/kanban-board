@@ -5,6 +5,8 @@
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
   import { uniqueId } from 'lodash-es';
+  import { onDestroy } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import { fade } from 'svelte/transition';
   import { Card as CardType, cardApi } from './api/jsonPlaceholder';
   import { editCardId } from './store/editId';
@@ -23,6 +25,10 @@
   $: editId = String(id ?? uniqueId('create_card_'));
   $: isEdit = $editCardId === editId;
   $: isShowButtons = isHover || isEdit;
+
+  let createUnsubscribe: Unsubscriber;
+  let updateUnsubscribe: Unsubscriber;
+  let deleteUnsubscribe: Unsubscriber;
 
   function toggleEdit() {
     if (!isEdit) {
@@ -63,8 +69,14 @@
       return;
     }
 
-    cardApi.update({ id, body }).subscribe(postProcess);
+    updateUnsubscribe = cardApi.update({ id, body }).subscribe(postProcess);
   }
+
+  onDestroy(() => {
+    createUnsubscribe && createUnsubscribe();
+    updateUnsubscribe && updateUnsubscribe();
+    deleteUnsubscribe && deleteUnsubscribe();
+  });
 </script>
 
 <div class="wrapper">
