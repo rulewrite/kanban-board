@@ -169,11 +169,11 @@
       {#if section?.comments?.length}
         <Content>
           {#each section.comments as id (id)}
-            <Card {id} />
+            <Card {id} sectionId={section.id} />
           {/each}
         </Content>
       {/if}
-      <Card />
+      <Card sectionId={section.id} />
     {/if}
   </Paper>
 </div>

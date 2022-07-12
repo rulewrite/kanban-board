@@ -4,17 +4,19 @@
   import type { TextfieldComponentDev } from '@smui/textfield';
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
-  import { uniqueId } from 'lodash-es';
+  import { uniq, uniqueId } from 'lodash-es';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { fade } from 'svelte/transition';
-  import { Card as CardType, cardApi } from './api/jsonPlaceholder';
+  import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import { editCardId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
 
+  const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
 
   export let id: CardType['id'] = null;
+  export let sectionId: Section['id'] = NaN;
 
   let bodyInput: TextfieldComponentDev;
   let body = '';
@@ -50,7 +52,31 @@
     };
   }
 
-  function create() {}
+  function create() {
+    const body = validate();
+    if (!body) {
+      return;
+    }
+
+    createUnsubscribe = cardApi
+      .create({
+        body: { ...body, postId: sectionId },
+      })
+      .subscribe(({ isFetching, failMessage, id }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+
+        sections.updateProperty(sectionId, ({ comments, ...section }) => {
+          return { ...section, comments: uniq([...comments, id]) };
+        });
+        editCardId.off(editId);
+      });
+  }
 
   function update() {
     const body = validate();

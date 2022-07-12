@@ -48,7 +48,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
     this.createStatusEntities = getCreateStatusEntities<E>(schema);
   }
 
-  create({ body, params }: { body: Omit<E, 'id'>; params?: P }) {
+  create({ body, params }: { body: Partial<Omit<E, 'id'>>; params?: P }) {
     const url = StatusApi.getUrl<P>(this.URL, params);
 
     if (!this.mapKeyToStatusEntity.has(url)) {
