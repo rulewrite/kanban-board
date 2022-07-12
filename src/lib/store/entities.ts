@@ -6,8 +6,12 @@ export interface Entity {
   id: number;
 }
 
+export const isDeleted = Symbol('isDeleted');
+
 interface Entities<E> {
-  [id: string]: E;
+  [id: string]: E & {
+    [isDeleted]?: boolean;
+  };
 }
 
 function createEntities<E>() {
@@ -22,7 +26,7 @@ function createEntities<E>() {
     },
     delete: (id: keyof Entities<E>) => {
       update((state) => {
-        delete state[id];
+        state[id][isDeleted] = true;
 
         return state;
       });
@@ -33,6 +37,7 @@ function createEntities<E>() {
 export const SECTIONS_SCHEMA_KEY = 'sections';
 export const CARDS_SCHEMA_KEY = 'cards';
 
+export type EntitiesKeys = keyof typeof mapKeyToEntities;
 export const mapKeyToEntities = {
   [SECTIONS_SCHEMA_KEY]: createEntities<Section>(),
   [CARDS_SCHEMA_KEY]: createEntities<Card>(),

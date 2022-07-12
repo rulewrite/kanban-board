@@ -84,9 +84,7 @@
   }
 
   function deleteSection() {
-    deleteUnsubscribe = sectionApi
-      .delete({ id, key: statusKey })
-      .subscribe(postProcess);
+    deleteUnsubscribe = sectionApi.delete({ id }).subscribe(postProcess);
   }
 
   onDestroy(() => {

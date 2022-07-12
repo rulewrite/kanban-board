@@ -1,7 +1,13 @@
 import { uniq } from 'lodash-es';
 import { normalize, schema } from 'normalizr';
 import { derived, writable } from 'svelte/store';
-import { Entity, mergeEntities } from '../../store/entities';
+import {
+  EntitiesKeys,
+  Entity,
+  isDeleted,
+  mapKeyToEntities,
+  mergeEntities,
+} from '../../store/entities';
 
 export interface Status {
   isFetching: boolean;
@@ -58,6 +64,8 @@ export type StatusEntityStore = ReturnType<
 export function getCreateStatusEntity<E extends Entity>(
   schema: schema.Entity<E>
 ) {
+  const entitiesStore = mapKeyToEntities[schema.key as EntitiesKeys];
+
   return (key: string) => {
     const {
       subscribe: statusSubscribe,
@@ -72,11 +80,16 @@ export function getCreateStatusEntity<E extends Entity>(
 
     return {
       ...derived(
-        [{ subscribe: statusSubscribe }, { subscribe }],
-        ([$status, $store]) => {
+        [
+          { subscribe: statusSubscribe },
+          { subscribe },
+          { subscribe: entitiesStore.subscribe },
+        ],
+        ([$status, { id, ...$store }, $entities]) => {
           return {
             ...$status,
             ...$store,
+            id: $entities[id]?.[isDeleted] ? null : id,
           };
         }
       ),
@@ -90,6 +103,16 @@ export function getCreateStatusEntity<E extends Entity>(
           return {
             ...store,
             id: result as E['id'],
+          };
+        });
+        success();
+      },
+      successDelete: (id: E['id']) => {
+        entitiesStore.delete(id);
+        update((store) => {
+          return {
+            ...store,
+            id,
           };
         });
         success();
@@ -108,6 +131,8 @@ export type StatusEntitiesStore = ReturnType<
 export function getCreateStatusEntities<E extends Entity>(
   schema: schema.Entity<E>
 ) {
+  const entitiesStore = mapKeyToEntities[schema.key as EntitiesKeys];
+
   return (key: string) => {
     const {
       subscribe: statusSubscribe,
@@ -122,11 +147,16 @@ export function getCreateStatusEntities<E extends Entity>(
 
     return {
       ...derived(
-        [{ subscribe: statusSubscribe }, { subscribe }],
-        ([$status, $store]) => {
+        [
+          { subscribe: statusSubscribe },
+          { subscribe },
+          { subscribe: entitiesStore.subscribe },
+        ],
+        ([$status, { ids, ...$store }, $entities]) => {
           return {
             ...$status,
             ...$store,
+            ids: (ids ?? []).filter((id) => !$entities[id][isDeleted]),
           };
         }
       ),
@@ -145,18 +175,10 @@ export function getCreateStatusEntities<E extends Entity>(
         success();
       },
       add: (id: E['id']) => {
-        update((store) => {
+        update(({ ids, ...store }) => {
           return {
             ...store,
-            ids: uniq([...store.ids, id]),
-          };
-        });
-      },
-      delete: (id: E['id']) => {
-        update((store) => {
-          return {
-            ...store,
-            ids: store.ids.filter((element) => element !== id),
+            ids: uniq([...ids, id]),
           };
         });
       },

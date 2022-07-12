@@ -173,7 +173,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
     return status;
   }
 
-  delete({ id, key, params }: { id: E['id']; key: string; params?: P }) {
+  delete({ id, params }: { id: E['id']; params?: P }) {
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
     const status = this.createStatusEntity(url);
 
@@ -188,8 +188,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
     })
       .then<{}>((response) => response.json())
       .then(() => {
-        status.success({ id });
-        this.mapKeyToStatusEntities.get(key)?.delete(id);
+        status.successDelete(id);
       })
       .catch((error: Error) => {
         status.failure(error.message ?? 'Unknown Error');
