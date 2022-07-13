@@ -183,6 +183,8 @@
     {#if section}
       {#if cardIds.length}
         <Content>
+          <div class="mdc-typography--caption">{cardIds}</div>
+
           {#each cardIds as cardId (cardId)}
             <Card id={cardId} sectionId={section.id} />
           {/each}

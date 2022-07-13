@@ -38,6 +38,8 @@
   </Group>
 </div>
 
+<div class="mdc-typography--caption">{ids}</div>
+
 <div class="wrapper">
   {#each ids as id (id)}
     <Section {id} />
