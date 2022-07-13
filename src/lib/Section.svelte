@@ -10,9 +10,10 @@
   import { Section, sectionApi } from './api/jsonPlaceholder';
   import Card from './Card.svelte';
   import { editSectionId } from './store/editId';
-  import { mapKeyToEntities } from './store/entities';
+  import { isDeleted, mapKeyToEntities } from './store/entities';
 
   const sections = mapKeyToEntities.sections;
+  const cards = mapKeyToEntities.cards;
 
   export let id: Section['id'] = null;
   export let createdId = NaN;
@@ -24,6 +25,10 @@
   $: section = $sections[id];
   $: editId = String(id ?? uniqueId('create_section_'));
   $: isEdit = $editSectionId === editId;
+  $: cardEntities = $cards;
+  $: cardIds = (section?.comments ?? []).filter(
+    (id) => !cardEntities[id]?.[isDeleted]
+  );
 
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
@@ -166,10 +171,10 @@
     {/if}
 
     {#if section}
-      {#if section?.comments?.length}
+      {#if cardIds.length}
         <Content>
-          {#each section.comments as id (id)}
-            <Card {id} sectionId={section.id} />
+          {#each cardIds as cardId (cardId)}
+            <Card id={cardId} sectionId={section.id} />
           {/each}
         </Content>
       {/if}

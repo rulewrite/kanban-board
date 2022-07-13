@@ -112,6 +112,22 @@
       });
   }
 
+  function deleteCard() {
+    deleteUnsubscribe = cardApi
+      .delete({ id })
+      .subscribe(({ isFetching, failMessage }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+
+        editCardId.off(editId);
+      });
+  }
+
   onDestroy(() => {
     createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
@@ -148,7 +164,12 @@
       <div transition:fade>
         <Actions>
           {#if isEdit}
-            <Button on:click={toggleEdit}>
+            {#if card}
+              <Button on:click={deleteCard} color="secondary">
+                <Label>삭제</Label>
+              </Button>
+            {/if}
+            <Button on:click={toggleEdit} color="secondary">
               <Label>취소</Label>
             </Button>
             <Button on:click={card ? update : create}>
