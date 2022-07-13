@@ -9,6 +9,7 @@
   import type { Unsubscriber } from 'svelte/store';
   import { Section, sectionApi } from './api/jsonPlaceholder';
   import Card from './Card.svelte';
+  import IdBadge from './IdBadge.svelte';
   import { editSectionId } from './store/editId';
   import { isDeleted, mapKeyToEntities } from './store/entities';
 
@@ -125,6 +126,7 @@
 
 <div class="placeholder">
   <Paper>
+    <IdBadge {id} />
     {#if isEdit}
       <Content>
         <Textfield
@@ -186,5 +188,6 @@
 <style>
   .placeholder {
     margin-right: 16px;
+    position: relative;
   }
 </style>

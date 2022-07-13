@@ -1,14 +1,15 @@
 <script lang="ts">
-  import Button, { Label } from '@smui/button';
-  import Card, { Actions, Content } from '@smui/card';
+  import Button,{ Label } from '@smui/button';
+  import Card,{ Actions,Content } from '@smui/card';
   import type { TextfieldComponentDev } from '@smui/textfield';
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
-  import { uniq, uniqueId, without } from 'lodash-es';
+  import { uniq,uniqueId,without } from 'lodash-es';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { fade } from 'svelte/transition';
-  import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
+  import { Card as CardType,cardApi,Section } from './api/jsonPlaceholder';
+  import IdBadge from './IdBadge.svelte';
   import { editCardId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
 
@@ -141,6 +142,7 @@
     on:mouseover={() => (isHover = true)}
     on:mouseleave={() => (isHover = false)}
   >
+    <IdBadge {id} />
     {#if isEdit}
       <Content>
         <Textfield
