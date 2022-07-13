@@ -26,7 +26,6 @@
   $: card = $cards[id];
   $: editId = String(id ?? uniqueId('create_card_'));
   $: isEdit = $editCardId === editId;
-  $: isShowButtons = (card && isHover) || isEdit;
 
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
@@ -130,6 +129,7 @@
     on:mouseleave={() => (isHover = false)}
   >
     <IdBadge {id} />
+
     {#if isEdit}
       <Content>
         <Textfield
@@ -144,12 +144,10 @@
         </Textfield>
       </Content>
     {:else if card}
-      <Content>
-        {card.body}
-      </Content>
+      <Content>{card.body}</Content>
     {/if}
 
-    {#if isShowButtons}
+    {#if (card && isHover) || isEdit}
       <div transition:fade>
         <Actions>
           {#if isEdit}

@@ -127,6 +127,7 @@
 <div class="placeholder">
   <Paper>
     <IdBadge {id} />
+
     {#if isEdit}
       <Content>
         <Textfield
@@ -143,30 +144,37 @@
         <Textfield textarea bind:value={body} label="Description">
           <HelperText slot="helper">섹션 설명</HelperText>
         </Textfield>
-
-        <Group variant="unelevated">
-          {#if section}
-            <Button on:click={deleteSection} color="secondary">
-              <Label>삭제</Label>
-            </Button>
-          {/if}
-          <Button on:click={toggleEdit} color="secondary">
-            <Label>취소</Label>
-          </Button>
-          <Button on:click={section ? update : create}>
-            <Label>{section ? '완료' : '생성'}</Label>
-          </Button>
-        </Group>
       </Content>
     {:else if section}
       <Title>{section.title}</Title>
       <Subtitle>{section.body}</Subtitle>
+    {/if}
+
+    {#if section || isEdit}
       <Content>
-        <Button on:click={toggleEdit}>
-          <Label>수정</Label>
-        </Button>
+        {#if isEdit}
+          <Group variant="unelevated">
+            {#if section}
+              <Button on:click={deleteSection} color="secondary">
+                <Label>삭제</Label>
+              </Button>
+            {/if}
+            <Button on:click={toggleEdit} color="secondary">
+              <Label>취소</Label>
+            </Button>
+            <Button on:click={section ? update : create}>
+              <Label>{section ? '완료' : '생성'}</Label>
+            </Button>
+          </Group>
+        {:else}
+          <Button on:click={toggleEdit}>
+            <Label>수정</Label>
+          </Button>
+        {/if}
       </Content>
-    {:else}
+    {/if}
+
+    {#if !isEdit && !section}
       <Button color="primary" on:click={toggleEdit}>
         <Label>섹션 생성하기</Label>
       </Button>
