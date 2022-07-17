@@ -7,7 +7,6 @@
   import { uniq, uniqueId } from 'lodash-es';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { fade } from 'svelte/transition';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
   import { editCardId } from './store/editId';
@@ -148,27 +147,25 @@
     {/if}
 
     {#if (card && isHover) || isEdit}
-      <div transition:fade>
-        <Actions>
-          {#if isEdit}
-            {#if card}
-              <Button on:click={deleteCard} color="secondary">
-                <Label>삭제</Label>
-              </Button>
-            {/if}
-            <Button on:click={toggleEdit} color="secondary">
-              <Label>취소</Label>
-            </Button>
-            <Button on:click={card ? update : create}>
-              <Label>{card ? '완료' : '생성'}</Label>
-            </Button>
-          {:else}
-            <Button on:click={toggleEdit}>
-              <Label>수정</Label>
+      <Actions>
+        {#if isEdit}
+          {#if card}
+            <Button on:click={deleteCard} color="secondary">
+              <Label>삭제</Label>
             </Button>
           {/if}
-        </Actions>
-      </div>
+          <Button on:click={toggleEdit} color="secondary">
+            <Label>취소</Label>
+          </Button>
+          <Button on:click={card ? update : create}>
+            <Label>{card ? '완료' : '생성'}</Label>
+          </Button>
+        {:else}
+          <Button on:click={toggleEdit}>
+            <Label>수정</Label>
+          </Button>
+        {/if}
+      </Actions>
     {/if}
 
     {#if !isEdit && !card}
