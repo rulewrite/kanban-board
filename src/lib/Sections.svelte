@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button, { Group } from '@smui/button';
-  import { beforeUpdate, onMount } from 'svelte';
+  import { afterUpdate, onMount } from 'svelte';
   import { sectionApi } from './api/jsonPlaceholder';
   import Section from './Section.svelte';
   import { isDeleted, mapKeyToEntities } from './store/entities';
@@ -25,7 +25,7 @@
     getSections();
   });
 
-  beforeUpdate(() => {
+  afterUpdate(() => {
     if (createdId) {
       status?.push(createdId);
     }
