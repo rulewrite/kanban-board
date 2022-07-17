@@ -183,7 +183,6 @@
 
 <style>
   .wrapper {
-    min-width: 300px;
     margin-top: 16px;
   }
 </style>

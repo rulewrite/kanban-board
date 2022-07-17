@@ -197,6 +197,7 @@
 
 <style>
   .placeholder {
+    min-width: 300px;
     margin-right: 16px;
     position: relative;
   }
