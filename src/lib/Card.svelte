@@ -5,7 +5,7 @@
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
   import { uniq, uniqueId } from 'lodash-es';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
@@ -30,12 +30,16 @@
   let updateUnsubscribe: Unsubscriber;
   let deleteUnsubscribe: Unsubscriber;
 
-  function toggleEdit() {
+  async function toggleEdit() {
+    editCardId.toggle(editId);
+
     if (!isEdit) {
       body = card?.body ?? '';
-    }
 
-    editCardId.toggle(editId);
+      await tick();
+
+      bodyInput?.focus();
+    }
   }
 
   function validate() {
