@@ -17,6 +17,12 @@ interface Params {
 
 const URL = 'https://jsonplaceholder.typicode.com';
 
+interface Arrangeable {
+  position: number;
+}
+
+const arrangeUnit = 65535;
+
 export interface Card {
   postId: number;
   id: number;
@@ -30,7 +36,7 @@ export const cardApi = new StatusApi<Params, Card>(
   cardSchema
 );
 
-export interface Section {
+export interface Section extends Arrangeable {
   id: number;
   title: string;
   body: string;
@@ -39,8 +45,19 @@ export interface Section {
 }
 export const sectionApi = new StatusApi<Params, Section>(
   `${URL}/posts`,
-  new schema.Entity<Section>(SECTIONS_SCHEMA_KEY, {
-    comments: [cardSchema],
-  }),
+  new schema.Entity<Section>(
+    SECTIONS_SCHEMA_KEY,
+    {
+      comments: [cardSchema],
+    },
+    {
+      processStrategy: (section) => {
+        return {
+          ...section,
+          position: arrangeUnit * section.id,
+        };
+      },
+    }
+  ),
   1
 );

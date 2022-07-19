@@ -11,9 +11,11 @@
   let createdId: number;
 
   $: sectionEntities = $sections;
-  $: ids = ($status?.ids ?? []).filter(
-    (id) => !sectionEntities[id]?.[isDeleted]
-  );
+  $: ids = ($status?.ids ?? [])
+    .map((id) => sectionEntities[id])
+    .filter((section) => !section?.[isDeleted])
+    .sort((a, b) => a.position - b.position)
+    .map(({ id }) => id);
 
   function getSections() {
     status = sectionApi.readList({
