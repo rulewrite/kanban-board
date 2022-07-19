@@ -7,6 +7,7 @@
   import { uniqueId } from 'lodash-es';
   import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
+  import { dragAndDrop } from './actions/dragAndDrop';
   import { Section, sectionApi } from './api/jsonPlaceholder';
   import Card from './Card.svelte';
   import IdBadge from './IdBadge.svelte';
@@ -128,7 +129,7 @@
   });
 </script>
 
-<div class="placeholder">
+<div class="placeholder" use:dragAndDrop>
   <Paper>
     <IdBadge {id} />
 
