@@ -124,10 +124,15 @@
   }
 
   function updatePosition(event: CustomEvent) {
+    const dropSectionId = $cards[event.detail.dropId].postId;
+    const draggingCardId = event.detail.id;
+    const draggingCardSectionId = $cards[draggingCardId].postId;
+
     updateUnsubscribe = cardApi
       .update({
-        id: event.detail.id,
+        id: draggingCardId,
         body: {
+          postId: dropSectionId,
           position: event.detail.position,
         },
       })
@@ -139,6 +144,23 @@
         if (failMessage) {
           return;
         }
+
+        if (dropSectionId === draggingCardSectionId) {
+          return;
+        }
+
+        sections.updateProperty(dropSectionId, ({ comments, ...section }) => {
+          return { ...section, comments: uniq([...comments, draggingCardId]) };
+        });
+        sections.updateProperty(
+          draggingCardSectionId,
+          ({ comments, ...section }) => {
+            return {
+              ...section,
+              comments: comments.filter((id) => id !== draggingCardId),
+            };
+          }
+        );
       });
   }
 
