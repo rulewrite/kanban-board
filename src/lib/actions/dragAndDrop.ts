@@ -62,6 +62,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     'drop',
     (event: DragEventTargetElement) => {
       event.preventDefault();
+      event.stopPropagation();
       event.currentTarget.classList.remove(dragenter);
       return false;
     },

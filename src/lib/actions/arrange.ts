@@ -50,6 +50,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
        * 예로 링크를 웹페이지로 드래그하면 브라우저가 링크로 리다이렉션 됨.
        */
       event.preventDefault();
+      event.stopPropagation();
 
       const draggingTarget: DraggingTarget = JSON.parse(
         event.dataTransfer.getData(format)
