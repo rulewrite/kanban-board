@@ -55,6 +55,10 @@ const mapEventTypeToListener = new Map<string, EventListener>([
         return;
       }
 
+      if (event.currentTarget.classList.contains(dragenter)) {
+        return;
+      }
+
       event.currentTarget.classList.add(dragenter);
     },
   ],
