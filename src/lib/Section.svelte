@@ -5,7 +5,7 @@
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
   import { uniqueId } from 'lodash-es';
-  import { onDestroy, tick } from 'svelte';
+  import { createEventDispatcher, onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { arrange } from './actions/arrange/arrange';
   import { Section, sectionApi } from './api/jsonPlaceholder';
@@ -22,8 +22,9 @@
 </script>
 
 <script lang="ts">
+  const dispatch = createEventDispatcher<{ createdId: number }>();
+
   export let id: Section['id'] = null;
-  export let createdId = NaN;
 
   let titleInput: TextfieldComponentDev;
   let title = '';
@@ -89,7 +90,8 @@
           return;
         }
 
-        createdId = id;
+        dispatch('createdId', id);
+
         editSectionId.off(editId);
       });
   }

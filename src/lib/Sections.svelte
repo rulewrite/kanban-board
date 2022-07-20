@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
   import Button, { Group } from '@smui/button';
-  import { afterUpdate, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { sectionApi } from './api/jsonPlaceholder';
   import Section from './Section.svelte';
   import { isDeleted, mapKeyToEntities } from './store/entities';
@@ -10,7 +10,6 @@
 
 <script lang="ts">
   let status: ReturnType<typeof sectionApi.readList>;
-  let createdId: number;
 
   $: sectionEntities = $sections;
   $: ids = ($status?.ids ?? [])
@@ -28,12 +27,6 @@
   onMount(() => {
     getSections();
   });
-
-  afterUpdate(() => {
-    if (createdId) {
-      status?.push(createdId);
-    }
-  });
 </script>
 
 <div id="buttons">
@@ -48,7 +41,11 @@
   {#each ids as id (id)}
     <Section {id} />
   {/each}
-  <Section bind:createdId />
+  <Section
+    on:createdId={(event) => {
+      status?.push(event.detail);
+    }}
+  />
 </div>
 
 <style>
