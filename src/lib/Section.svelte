@@ -8,6 +8,7 @@
   import { createEventDispatcher, onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { arrange } from './actions/arrange/arrange';
+  import { clickOutside } from './actions/clickOutside';
   import { Section, sectionApi } from './api/jsonPlaceholder';
   import Card from './Card.svelte';
   import IdBadge from './IdBadge.svelte';
@@ -174,7 +175,12 @@
     <IdBadge {id} />
 
     {#if isEdit}
-      <Content>
+      <Content
+        use={[clickOutside]}
+        on:outclick={() => {
+          toggleEdit();
+        }}
+      >
         <Textfield
           bind:this={titleInput}
           bind:value={title}
@@ -191,31 +197,24 @@
         </Textfield>
       </Content>
     {:else if section}
-      <Title>{section.title}</Title>
-      <Subtitle>{section.body}</Subtitle>
+      <div on:click={toggleEdit}>
+        <Title>{section.title}</Title>
+        <Subtitle>{section.body}</Subtitle>
+      </div>
     {/if}
 
-    {#if section || isEdit}
+    {#if isEdit}
       <Content>
-        {#if isEdit}
-          <Group variant="unelevated">
-            {#if section}
-              <Button on:click={deleteSection} color="secondary">
-                <Label>삭제</Label>
-              </Button>
-            {/if}
-            <Button on:click={toggleEdit} color="secondary">
-              <Label>취소</Label>
+        <Group variant="unelevated">
+          {#if section}
+            <Button on:click={deleteSection} color="secondary">
+              <Label>삭제</Label>
             </Button>
-            <Button on:click={section ? update : create}>
-              <Label>{section ? '완료' : '생성'}</Label>
-            </Button>
-          </Group>
-        {:else}
-          <Button on:click={toggleEdit}>
-            <Label>수정</Label>
+          {/if}
+          <Button on:click={section ? update : create}>
+            <Label>{section ? '완료' : '생성'}</Label>
           </Button>
-        {/if}
+        </Group>
       </Content>
     {/if}
 
