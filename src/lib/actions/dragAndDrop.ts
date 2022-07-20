@@ -1,6 +1,7 @@
 import { css, injectGlobal } from '@emotion/css';
 
 const draggable = css`
+  pointer-events: initial;
   cursor: pointer;
 `;
 
@@ -16,7 +17,7 @@ const dragenter = css`
 const draggableSelector = `.${draggable}`;
 
 injectGlobal`
-  ${draggableSelector} * {
+  ${draggableSelector} *:not(${draggableSelector}) {
     pointer-events: none;
   }
 `;
