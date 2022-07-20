@@ -18,14 +18,29 @@ interface Params {
 
 const URL = 'https://jsonplaceholder.typicode.com';
 
-export interface Card {
+export interface Card extends Arrangeable {
   postId: number;
   id: number;
   name: string;
   email: string;
   body: string;
 }
-const cardSchema = new schema.Entity<Card>(CARDS_SCHEMA_KEY);
+const cardSchema = new schema.Entity<Card>(
+  CARDS_SCHEMA_KEY,
+  {},
+  {
+    processStrategy: (card) => {
+      if (card.position) {
+        return card;
+      }
+
+      return {
+        ...card,
+        position: arrangeUnit * card.id,
+      };
+    },
+  }
+);
 export const cardApi = new StatusApi<Params, Card>(
   `${URL}/comments`,
   cardSchema

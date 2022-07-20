@@ -7,6 +7,7 @@
   import { uniq, uniqueId } from 'lodash-es';
   import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
+  import { arrange } from './actions/arrange';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
   import { editCardId } from './store/editId';
@@ -118,6 +119,25 @@
       });
   }
 
+  function updatePosition(event: CustomEvent) {
+    updateUnsubscribe = cardApi
+      .update({
+        id: event.detail.id,
+        body: {
+          position: event.detail.position,
+        },
+      })
+      .subscribe(({ isFetching, failMessage }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+      });
+  }
+
   onDestroy(() => {
     createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
@@ -125,7 +145,16 @@
   });
 </script>
 
-<div class="wrapper">
+<div
+  class="wrapper"
+  use:arrange={card
+    ? {
+        id: card.id,
+        position: card.position,
+        updatePosition,
+      }
+    : null}
+>
   <Card
     variant="outlined"
     on:mouseover={() => (isHover = true)}

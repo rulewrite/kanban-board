@@ -28,9 +28,11 @@
   $: editId = String(id ?? uniqueId('create_section_'));
   $: isEdit = $editSectionId === editId;
   $: cardEntities = $cards;
-  $: cardIds = (section?.comments ?? []).filter(
-    (id) => !cardEntities[id]?.[isDeleted]
-  );
+  $: cardIds = (section?.comments ?? [])
+    .map((id) => cardEntities[id])
+    .filter((cartd) => !cartd?.[isDeleted])
+    .sort((a, b) => a.position - b.position)
+    .map(({ id }) => id);
 
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
