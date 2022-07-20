@@ -190,7 +190,7 @@
     on:mouseover={() => (isHover = true)}
     on:mouseleave={() => (isHover = false)}
   >
-    <IdBadge {id} />
+    <IdBadge {id} isSubColor={true} />
 
     {#if isEdit}
       <Content>
