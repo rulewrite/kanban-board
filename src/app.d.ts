@@ -1,11 +1,11 @@
-type UpdatePositionEvent = CustomEvent<{
+type DropPositionEvent = CustomEvent<{
   id: number;
   position: number;
 }>;
 
 declare namespace svelte.JSX {
   interface HTMLAttributes<T> {
-    onoutclick?: () => void;
-    onupdatePosition?: (e: UpdatePositionEvent) => void;
+    onoutClick?: () => void;
+    ondropPosition?: (e: DropPositionEvent) => void;
   }
 }

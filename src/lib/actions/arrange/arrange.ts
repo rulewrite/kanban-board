@@ -118,7 +118,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       }
 
       $dropTarget.dispatchEvent(
-        new CustomEvent<UpdatePositionEvent['detail']>('updatePosition', {
+        new CustomEvent<DropPositionEvent['detail']>('dropPosition', {
           detail: {
             id: draggingTarget.id,
             position: orderedPosition.getBetween(

@@ -134,7 +134,7 @@
       });
   }
 
-  function updatePosition(event: UpdatePositionEvent) {
+  function dropPosition(event: DropPositionEvent) {
     updateUnsubscribe = sectionApi
       .update({
         id: event.detail.id,
@@ -169,7 +169,7 @@
         position: section.position,
       }
     : null}
-  on:updatePosition={updatePosition}
+  on:dropPosition={dropPosition}
 >
   <Paper>
     <IdBadge {id} />
@@ -177,7 +177,7 @@
     {#if isEdit}
       <Content
         use={[clickOutside]}
-        on:outclick={() => {
+        on:outClick={() => {
           toggleEdit();
         }}
       >

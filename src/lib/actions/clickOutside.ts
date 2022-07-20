@@ -9,7 +9,7 @@ export function clickOutside(node: HTMLElement) {
       return;
     }
 
-    node.dispatchEvent(new CustomEvent('outclick'));
+    node.dispatchEvent(new CustomEvent('outClick'));
   };
 
   document.addEventListener('click', handleClick, true);
