@@ -1,8 +1,4 @@
 <script lang="ts" context="module">
-  const groupId = Symbol('cardsArrange');
-</script>
-
-<script lang="ts">
   import Button, { Label } from '@smui/button';
   import Card, { Actions, Content } from '@smui/card';
   import type { TextfieldComponentDev } from '@smui/textfield';
@@ -14,12 +10,17 @@
   import { arrange } from './actions/arrange/arrange';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
-  import { editCardId } from './store/editId';
+  import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
+
+  const groupId = Symbol('cardsArrange');
+  const editCardId = createEditId();
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
+</script>
 
+<script lang="ts">
   export let id: CardType['id'] = null;
   export let sectionId: Section['id'] = NaN;
 

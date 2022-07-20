@@ -1,8 +1,4 @@
 <script lang="ts" context="module">
-  const groupId = Symbol('sectionsArrange');
-</script>
-
-<script lang="ts">
   import Button, { Group, Label } from '@smui/button';
   import Paper, { Content, Subtitle, Title } from '@smui/paper';
   import type { TextfieldComponentDev } from '@smui/textfield';
@@ -15,12 +11,17 @@
   import { Section, sectionApi } from './api/jsonPlaceholder';
   import Card from './Card.svelte';
   import IdBadge from './IdBadge.svelte';
-  import { editSectionId } from './store/editId';
+  import { createEditId } from './store/editId';
   import { isDeleted, mapKeyToEntities } from './store/entities';
+
+  const groupId = Symbol('sectionsArrange');
+  const editSectionId = createEditId();
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
+</script>
 
+<script lang="ts">
   export let id: Section['id'] = null;
   export let createdId = NaN;
 

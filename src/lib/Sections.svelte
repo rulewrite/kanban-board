@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" context="module">
   import Button, { Group } from '@smui/button';
   import { afterUpdate, onMount } from 'svelte';
   import { sectionApi } from './api/jsonPlaceholder';
@@ -6,7 +6,9 @@
   import { isDeleted, mapKeyToEntities } from './store/entities';
 
   const sections = mapKeyToEntities.sections;
+</script>
 
+<script lang="ts">
   let status: ReturnType<typeof sectionApi.readList>;
   let createdId: number;
 

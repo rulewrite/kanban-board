@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-function createEditId(id?: string) {
+export function createEditId(id?: string) {
   const emptyId = Symbol();
   const { subscribe, update } = writable<string | Symbol>(id ?? emptyId);
 
@@ -26,6 +26,3 @@ function createEditId(id?: string) {
     },
   };
 }
-
-export const editSectionId = createEditId();
-export const editCardId = createEditId();
