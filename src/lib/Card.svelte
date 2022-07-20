@@ -126,7 +126,7 @@
       });
   }
 
-  function updatePosition(event: CustomEvent) {
+  function updatePosition(event: UpdatePositionEvent) {
     const dropSectionId = $cards[event.detail.dropId].postId;
     const draggingCardId = event.detail.id;
     const draggingCardSectionId = $cards[draggingCardId].postId;
@@ -181,9 +181,9 @@
         groupId,
         id: card.id,
         position: card.position,
-        updatePosition,
       }
     : null}
+  on:updatePosition={updatePosition}
 >
   <Card
     variant="outlined"

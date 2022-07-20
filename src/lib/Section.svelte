@@ -134,7 +134,7 @@
       });
   }
 
-  function updatePosition(event: CustomEvent) {
+  function updatePosition(event: UpdatePositionEvent) {
     updateUnsubscribe = sectionApi
       .update({
         id: event.detail.id,
@@ -167,9 +167,9 @@
         groupId,
         id: section.id,
         position: section.position,
-        updatePosition,
       }
     : null}
+  on:updatePosition={updatePosition}
 >
   <Paper>
     <IdBadge {id} />

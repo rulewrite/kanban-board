@@ -2,7 +2,6 @@ import OrderedPosition, { Id, Position } from './OrderedPosition';
 import { dragenter, draggable, dragging } from './style';
 
 const format = 'text/plain';
-const updatePositionEventName = 'updatePosition';
 const gorupId = Symbol('gorupId');
 const orderedPosition = new OrderedPosition();
 
@@ -119,7 +118,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       }
 
       $dropTarget.dispatchEvent(
-        new CustomEvent(updatePositionEventName, {
+        new CustomEvent<UpdatePositionEvent['detail']>('updatePosition', {
           detail: {
             id: draggingTarget.id,
             position: orderedPosition.getBetween(
@@ -139,7 +138,6 @@ const mapEventTypeToListener = new Map<string, EventListener>([
 
 interface Parameter extends Arrangeable {
   groupId: Id;
-  updatePosition: EventListener;
 }
 
 export function arrange(node: HTMLElement, parameter: Parameter | null) {
@@ -150,30 +148,25 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
   node.setAttribute('draggable', 'true');
   node.classList.add(draggable);
 
-  const { id, position, groupId, updatePosition } = parameter;
+  const { id, position, groupId } = parameter;
 
   node.dataset.id = String(id);
   node.dataset.position = String(position);
   node[gorupId] = groupId;
   orderedPosition.add(groupId, position);
 
-  node.addEventListener(updatePositionEventName, updatePosition);
   mapEventTypeToListener.forEach((listener, eventType) => {
     node.addEventListener(eventType, listener);
   });
 
   return {
-    update({ id, position, groupId, updatePosition }: Parameter) {
+    update({ id, position, groupId }: Parameter) {
       node.dataset.id = String(id);
       node.dataset.position = String(position);
       node[gorupId] = groupId;
       orderedPosition.substitution(groupId, parameter.position, position);
-
-      node.removeEventListener(updatePositionEventName, updatePosition);
-      node.addEventListener(updatePositionEventName, updatePosition);
     },
     destroy() {
-      node.removeEventListener(updatePositionEventName, updatePosition);
       mapEventTypeToListener.forEach((listener, eventType) => {
         node.removeEventListener(eventType, listener);
       });
