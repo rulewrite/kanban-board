@@ -1,4 +1,26 @@
-import { dragAndDrop, DragEventTargetElement } from './dragAndDrop';
+import { css, injectGlobal } from '@emotion/css';
+
+const draggable = css`
+  pointer-events: initial;
+  cursor: pointer;
+`;
+
+const dragging = css`
+  opacity: 0.5;
+`;
+
+const dragenter = css`
+  border: 5px dashed #ddd;
+  box-sizing: border-box;
+`;
+
+const draggableSelector = `.${draggable}`;
+
+injectGlobal`
+  ${draggableSelector} *:not(${draggableSelector}) {
+    pointer-events: none;
+  }
+`;
 
 export const arrangeUnit = 65535;
 const format = 'text/plain';
@@ -12,11 +34,19 @@ interface DraggingTarget extends Arrangeable {
   id: number;
 }
 
+interface DragEventTargetElement extends DragEvent {
+  target: HTMLElement;
+  currentTarget: HTMLElement;
+}
+
 const mapEventTypeToListener = new Map<string, EventListener>([
   [
+    // 엘리먼트나 텍스트 블록을 드래그하기 시작할 때
     'dragstart',
     (event: DragEventTargetElement) => {
       event.stopPropagation();
+
+      event.currentTarget.classList.add(dragging);
 
       const { id, position } = event.currentTarget.dataset;
 
@@ -25,6 +55,33 @@ const mapEventTypeToListener = new Map<string, EventListener>([
         format,
         JSON.stringify({ id: Number(id), position: Number(position) })
       );
+    },
+  ],
+  [
+    // 드래그가 끝났을 때 (마우스 버튼을 떼거나 ESC 키를 누를 때)
+    'dragend',
+    (event: DragEventTargetElement) => {
+      event.stopPropagation();
+
+      event.currentTarget.classList.remove(dragging);
+    },
+  ],
+  [
+    // 드래그 중인 대상이 적합한 드롭 대상위에 올라갔을 때
+    'dragenter',
+    (event: DragEventTargetElement) => {
+      event.stopPropagation();
+
+      event.currentTarget.classList.add(dragenter);
+    },
+  ],
+  [
+    // 드래그 중인 대상이 적합한 드롭 대상에서 벗어났을 때
+    'dragleave',
+    (event: DragEventTargetElement) => {
+      event.stopPropagation();
+
+      event.currentTarget.classList.remove(dragenter);
     },
   ],
   [
@@ -52,6 +109,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
        */
       event.preventDefault();
       event.stopPropagation();
+      event.currentTarget.classList.remove(dragenter);
 
       const draggingTarget: DraggingTarget = JSON.parse(
         event.dataTransfer.getData(format)
@@ -94,6 +152,9 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
     return {};
   }
 
+  node.setAttribute('draggable', 'true');
+  node.classList.add(draggable);
+
   const { id, position, updatePosition } = parameter;
 
   node.dataset.id = String(id);
@@ -103,8 +164,6 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
   mapEventTypeToListener.forEach((listener, eventType) => {
     node.addEventListener(eventType, listener);
   });
-
-  const { destroy } = dragAndDrop(node);
 
   return {
     update({ id, position, updatePosition }: Parameter) {
@@ -119,8 +178,6 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
       mapEventTypeToListener.forEach((listener, eventType) => {
         node.removeEventListener(eventType, listener);
       });
-
-      destroy();
     },
   };
 }
