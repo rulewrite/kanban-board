@@ -1,4 +1,5 @@
 import { css, injectGlobal } from '@emotion/css';
+import OrderedPosition, { Id, Position } from './OrderedPosition';
 
 const draggable = css`
   pointer-events: initial;
@@ -26,10 +27,11 @@ export const arrangeUnit = 65535;
 const format = 'text/plain';
 const updatePositionEventName = 'updatePosition';
 const gorupId = Symbol('gorupId');
-let currentGroupid: Symbol = null;
+let currentGroupid: Id = null;
+const orderedPosition = new OrderedPosition();
 
 export interface Arrangeable {
-  position: number;
+  position: Position;
 }
 
 interface DraggingTarget extends Arrangeable {
@@ -132,21 +134,15 @@ const mapEventTypeToListener = new Map<string, EventListener>([
         return false;
       }
 
-      const isNext = draggingTarget.position < position;
-      const sibling = (
-        isNext
-          ? $dropTarget.nextElementSibling
-          : $dropTarget.previousElementSibling
-      ) as HTMLElement | null;
-      const siblingPosition = sibling
-        ? Number(sibling.dataset.position ?? 0)
-        : 0;
-
       $dropTarget.dispatchEvent(
         new CustomEvent(updatePositionEventName, {
           detail: {
             id: draggingTarget.id,
-            position: (position + siblingPosition) / 2,
+            position: orderedPosition.getBetween(
+              currentGroupid,
+              draggingTarget.position < position,
+              position
+            ),
             dropId: Number($dropTarget.dataset.id),
           },
         })
@@ -158,7 +154,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
 ] as const);
 
 interface Parameter extends DraggingTarget {
-  groupId: typeof currentGroupid;
+  groupId: Id;
   updatePosition: EventListener;
 }
 
@@ -171,6 +167,8 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
   node.classList.add(draggable);
 
   const { id, position, groupId, updatePosition } = parameter;
+
+  orderedPosition.add(groupId, position);
 
   node.dataset.id = String(id);
   node.dataset.position = String(position);
@@ -186,6 +184,7 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
       node.dataset.id = String(id);
       node.dataset.position = String(position);
       node[gorupId] = groupId;
+      orderedPosition.substitution(groupId, parameter.position, position);
 
       node.removeEventListener(updatePositionEventName, updatePosition);
       node.addEventListener(updatePositionEventName, updatePosition);
