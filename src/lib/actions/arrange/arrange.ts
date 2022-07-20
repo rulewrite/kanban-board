@@ -64,7 +64,16 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DragEventTargetElement) => {
       event.stopPropagation();
 
-      event.currentTarget.classList.remove(dragenter);
+      const rect = event.currentTarget.getBoundingClientRect();
+
+      if (
+        event.clientX <= rect.left ||
+        event.clientX >= rect.right ||
+        event.clientY <= rect.top ||
+        event.clientY >= rect.bottom
+      ) {
+        event.currentTarget.classList.remove(dragenter);
+      }
     },
   ],
   [
