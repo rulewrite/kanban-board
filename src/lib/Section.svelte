@@ -46,14 +46,16 @@
   async function toggleEdit() {
     editSectionId.toggle(editId);
 
-    if (!isEdit) {
-      title = section?.title ?? '';
-      body = section?.body ?? '';
-
-      await tick();
-
-      titleInput?.focus();
+    if (isEdit) {
+      return;
     }
+
+    title = section?.title ?? '';
+    body = section?.body ?? '';
+
+    await tick();
+
+    titleInput?.focus();
   }
 
   function validate() {

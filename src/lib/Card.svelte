@@ -39,13 +39,15 @@
   async function toggleEdit() {
     editCardId.toggle(editId);
 
-    if (!isEdit) {
-      body = card?.body ?? '';
-
-      await tick();
-
-      bodyInput?.focus();
+    if (isEdit) {
+      return;
     }
+
+    body = card?.body ?? '';
+
+    await tick();
+
+    bodyInput?.focus();
   }
 
   function validate() {
