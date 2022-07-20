@@ -126,7 +126,6 @@ const mapEventTypeToListener = new Map<string, EventListener>([
               draggingTarget.position < position,
               position
             ),
-            dropId: Number($dropTarget.dataset.id),
           },
         })
       );

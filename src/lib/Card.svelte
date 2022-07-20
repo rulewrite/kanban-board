@@ -127,7 +127,7 @@
   }
 
   function updatePosition(event: UpdatePositionEvent) {
-    const dropSectionId = $cards[event.detail.dropId].postId;
+    const sectionId = card.postId;
     const draggingCardId = event.detail.id;
     const draggingCardSectionId = $cards[draggingCardId].postId;
 
@@ -135,7 +135,7 @@
       .update({
         id: draggingCardId,
         body: {
-          postId: dropSectionId,
+          postId: sectionId,
           position: event.detail.position,
         },
       })
@@ -148,11 +148,11 @@
           return;
         }
 
-        if (dropSectionId === draggingCardSectionId) {
+        if (sectionId === draggingCardSectionId) {
           return;
         }
 
-        sections.updateEntity(dropSectionId, ({ comments, ...section }) => {
+        sections.updateEntity(sectionId, ({ comments, ...section }) => {
           return { ...section, comments: uniq([...comments, draggingCardId]) };
         });
         sections.updateEntity(

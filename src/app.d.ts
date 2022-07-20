@@ -1,6 +1,5 @@
 type UpdatePositionEvent = CustomEvent<{
   id: number;
-  dropId: number;
   position: number;
 }>;
 
