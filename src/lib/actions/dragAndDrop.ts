@@ -41,6 +41,8 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     // 드래그가 끝났을 때 (마우스 버튼을 떼거나 ESC 키를 누를 때)
     'dragend',
     (event: DragEventTargetElement) => {
+      event.stopPropagation();
+
       event.currentTarget.classList.remove(dragging);
     },
   ],
@@ -57,6 +59,8 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     // 드래그 중인 대상이 적합한 드롭 대상에서 벗어났을 때
     'dragleave',
     (event: DragEventTargetElement) => {
+      event.stopPropagation();
+
       event.currentTarget.classList.remove(dragenter);
     },
   ],

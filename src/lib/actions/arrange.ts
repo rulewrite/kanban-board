@@ -37,6 +37,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
        * 따라서 드롭을 허용하려면 기본 처리를 막아야 함.
        */
       event.preventDefault();
+      event.stopPropagation();
       return false;
     },
   ],
