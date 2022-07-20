@@ -4,8 +4,9 @@ import { dragenter, draggable, dragging } from './style';
 const format = 'text/plain';
 const updatePositionEventName = 'updatePosition';
 const gorupId = Symbol('gorupId');
-let currentGroupid: Id = null;
 const orderedPosition = new OrderedPosition();
+
+let currentGroupid: Id = null;
 
 export interface Arrangeable {
   position: Position;
@@ -151,11 +152,10 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
 
   const { id, position, groupId, updatePosition } = parameter;
 
-  orderedPosition.add(groupId, position);
-
   node.dataset.id = String(id);
   node.dataset.position = String(position);
   node[gorupId] = groupId;
+  orderedPosition.add(groupId, position);
 
   node.addEventListener(updatePositionEventName, updatePosition);
   mapEventTypeToListener.forEach((listener, eventType) => {
