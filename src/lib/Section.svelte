@@ -7,7 +7,7 @@
   import { uniqueId } from 'lodash-es';
   import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { dragAndDrop } from './actions/dragAndDrop';
+  import { arrange } from './actions/arrange';
   import { Section, sectionApi } from './api/jsonPlaceholder';
   import Card from './Card.svelte';
   import IdBadge from './IdBadge.svelte';
@@ -122,6 +122,25 @@
       });
   }
 
+  function updatePosition(event: CustomEvent) {
+    updateUnsubscribe = sectionApi
+      .update({
+        id: event.detail.id,
+        body: {
+          position: event.detail.position,
+        },
+      })
+      .subscribe(({ isFetching, failMessage }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+      });
+  }
+
   onDestroy(() => {
     createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
@@ -129,7 +148,16 @@
   });
 </script>
 
-<div class="placeholder" use:dragAndDrop>
+<div
+  class="placeholder"
+  use:arrange={section
+    ? {
+        id: section.id,
+        position: section.position,
+        updatePosition,
+      }
+    : null}
+>
   <Paper>
     <IdBadge {id} />
 

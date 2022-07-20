@@ -1,4 +1,5 @@
 import { schema } from 'normalizr';
+import { Arrangeable, arrangeUnit } from '../actions/arrange';
 import { CARDS_SCHEMA_KEY, SECTIONS_SCHEMA_KEY } from '../store/entities';
 import StatusApi from './StatusApi';
 
@@ -16,12 +17,6 @@ interface Params {
 }
 
 const URL = 'https://jsonplaceholder.typicode.com';
-
-interface Arrangeable {
-  position: number;
-}
-
-const arrangeUnit = 65535;
 
 export interface Card {
   postId: number;
@@ -52,6 +47,10 @@ export const sectionApi = new StatusApi<Params, Section>(
     },
     {
       processStrategy: (section) => {
+        if (section.position) {
+          return section;
+        }
+
         return {
           ...section,
           position: arrangeUnit * section.id,

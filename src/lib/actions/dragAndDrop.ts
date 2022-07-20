@@ -21,7 +21,7 @@ injectGlobal`
   }
 `;
 
-interface DragEventTargetElement extends DragEvent {
+export interface DragEventTargetElement extends DragEvent {
   target: HTMLElement;
   currentTarget: HTMLElement;
 }
@@ -53,6 +53,14 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     'dragleave',
     (event: DragEventTargetElement) => {
       event.currentTarget.classList.remove(dragenter);
+    },
+  ],
+  [
+    'drop',
+    (event: DragEventTargetElement) => {
+      event.preventDefault();
+      event.currentTarget.classList.remove(dragenter);
+      return false;
     },
   ],
 ] as const);
