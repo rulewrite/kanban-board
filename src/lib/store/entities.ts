@@ -19,7 +19,7 @@ function createEntities<E extends Entity>() {
 
   return {
     subscribe,
-    updateProperty: (id: E['id'], updater: (e: E) => E) => {
+    updateEntity: (id: E['id'], updater: (e: E) => E) => {
       update((state) => {
         state[id] = updater(state[id]);
         return state;

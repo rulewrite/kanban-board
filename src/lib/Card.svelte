@@ -82,7 +82,7 @@
           return;
         }
 
-        sections.updateProperty(sectionId, ({ comments, ...section }) => {
+        sections.updateEntity(sectionId, ({ comments, ...section }) => {
           return { ...section, comments: uniq([...comments, id]) };
         });
         editCardId.off(editId);
@@ -152,10 +152,10 @@
           return;
         }
 
-        sections.updateProperty(dropSectionId, ({ comments, ...section }) => {
+        sections.updateEntity(dropSectionId, ({ comments, ...section }) => {
           return { ...section, comments: uniq([...comments, draggingCardId]) };
         });
-        sections.updateProperty(
+        sections.updateEntity(
           draggingCardSectionId,
           ({ comments, ...section }) => {
             return {
