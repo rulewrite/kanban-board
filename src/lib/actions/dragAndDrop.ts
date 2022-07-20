@@ -48,6 +48,8 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     // 드래그 중인 대상이 적합한 드롭 대상위에 올라갔을 때
     'dragenter',
     (event: DragEventTargetElement) => {
+      event.stopPropagation();
+
       event.currentTarget.classList.add(dragenter);
     },
   ],
