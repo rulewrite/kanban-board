@@ -32,6 +32,8 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     // 엘리먼트나 텍스트 블록을 드래그하기 시작할 때
     'dragstart',
     (event: DragEventTargetElement) => {
+      event.stopPropagation();
+
       event.currentTarget.classList.add(dragging);
     },
   ],

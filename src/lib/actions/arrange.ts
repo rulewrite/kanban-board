@@ -16,6 +16,8 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   [
     'dragstart',
     (event: DragEventTargetElement) => {
+      event.stopPropagation();
+
       const { id, position } = event.currentTarget.dataset;
 
       event.dataTransfer.effectAllowed = 'move';
