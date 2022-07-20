@@ -138,7 +138,9 @@ const mapEventTypeToListener = new Map<string, EventListener>([
           ? $dropTarget.nextElementSibling
           : $dropTarget.previousElementSibling
       ) as HTMLElement | null;
-      const siblingPosition = sibling ? Number(sibling.dataset.position) : 0;
+      const siblingPosition = sibling
+        ? Number(sibling.dataset.position ?? 0)
+        : 0;
 
       $dropTarget.dispatchEvent(
         new CustomEvent(updatePositionEventName, {
