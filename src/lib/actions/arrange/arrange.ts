@@ -1,27 +1,5 @@
-import { css, injectGlobal } from '@emotion/css';
 import OrderedPosition, { Id, Position } from './OrderedPosition';
-
-const draggable = css`
-  pointer-events: initial;
-  cursor: pointer;
-`;
-
-const dragging = css`
-  opacity: 0.5;
-`;
-
-const dragenter = css`
-  border: 5px dashed #ddd;
-  box-sizing: border-box;
-`;
-
-const draggableSelector = `.${draggable}`;
-
-injectGlobal`
-  ${draggableSelector} *:not(${draggableSelector}) {
-    pointer-events: none;
-  }
-`;
+import { dragenter, draggable, dragging } from './style';
 
 export const arrangeUnit = 65535;
 const format = 'text/plain';
@@ -32,9 +10,6 @@ const orderedPosition = new OrderedPosition();
 
 export interface Arrangeable {
   position: Position;
-}
-
-interface DraggingTarget extends Arrangeable {
   id: number;
 }
 
@@ -120,7 +95,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.stopPropagation();
       event.currentTarget.classList.remove(dragenter);
 
-      const draggingTarget: DraggingTarget = JSON.parse(
+      const draggingTarget: Arrangeable = JSON.parse(
         event.dataTransfer.getData(format)
       );
       const $dropTarget = event.currentTarget;
@@ -153,7 +128,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   ],
 ] as const);
 
-interface Parameter extends DraggingTarget {
+interface Parameter extends Arrangeable {
   groupId: Id;
   updatePosition: EventListener;
 }

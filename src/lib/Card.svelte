@@ -11,7 +11,7 @@
   import { uniq, uniqueId } from 'lodash-es';
   import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { arrange } from './actions/arrange';
+  import { arrange } from './actions/arrange/arrange';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
   import { editCardId } from './store/editId';
