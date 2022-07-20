@@ -1,7 +1,6 @@
 import OrderedPosition, { Id, Position } from './OrderedPosition';
 import { dragenter, draggable, dragging } from './style';
 
-export const arrangeUnit = 65535;
 const format = 'text/plain';
 const updatePositionEventName = 'updatePosition';
 const gorupId = Symbol('gorupId');

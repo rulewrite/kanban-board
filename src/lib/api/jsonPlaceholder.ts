@@ -1,5 +1,6 @@
 import { schema } from 'normalizr';
-import { Arrangeable, arrangeUnit } from '../actions/arrange/arrange';
+import { Arrangeable } from '../actions/arrange/arrange';
+import { arrangeUnit } from '../actions/arrange/OrderedPosition';
 import { CARDS_SCHEMA_KEY, SECTIONS_SCHEMA_KEY } from '../store/entities';
 import StatusApi from './StatusApi';
 

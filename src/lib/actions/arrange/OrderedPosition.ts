@@ -4,6 +4,8 @@ export type Id = Symbol;
 
 export type Position = number;
 
+export const arrangeUnit = 65535;
+
 class OrderedPosition {
   private mapPositions = new Map<Id, Array<Position>>();
 
@@ -36,6 +38,12 @@ class OrderedPosition {
     const positions = this.getWithInitial(groupId);
 
     const index = positions.findIndex((p) => p === position);
+
+    const isLast = positions.length - 1 === index;
+    if (isLast) {
+      return position + arrangeUnit;
+    }
+
     const prevPosition = positions[index + (isNext ? 1 : -1)] ?? 0;
     return (prevPosition + position) / 2;
   }
