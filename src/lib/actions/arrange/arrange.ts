@@ -2,7 +2,7 @@ import OrderedPosition, { Id, Position } from './OrderedPosition';
 import { dragenter, draggable, dragging } from './style';
 
 const format = 'text/plain';
-const gorupId = Symbol('gorupId');
+const groupIdKey = Symbol('groupId');
 const orderedPosition = new OrderedPosition();
 
 let currentGroupid: Id = null;
@@ -27,7 +27,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.currentTarget.classList.add(dragging);
 
       const { id, position } = event.currentTarget.dataset;
-      currentGroupid = event.currentTarget[gorupId];
+      currentGroupid = event.currentTarget[groupIdKey];
 
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer.setData(
@@ -51,7 +51,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DragEventTargetElement) => {
       event.stopPropagation();
 
-      if (currentGroupid !== event.currentTarget[gorupId]) {
+      if (currentGroupid !== event.currentTarget[groupIdKey]) {
         return;
       }
 
@@ -112,7 +112,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       );
       const $dropTarget = event.currentTarget;
 
-      if (currentGroupid !== $dropTarget[gorupId]) {
+      if (currentGroupid !== $dropTarget[groupIdKey]) {
         return false;
       }
 
@@ -155,7 +155,7 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
 
   node.dataset.id = String(id);
   node.dataset.position = String(position);
-  node[gorupId] = groupId;
+  node[groupIdKey] = groupId;
   orderedPosition.add(groupId, position);
 
   mapEventTypeToListener.forEach((listener, eventType) => {
@@ -166,7 +166,7 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
     update({ id, position, groupId }: Parameter) {
       node.dataset.id = String(id);
       node.dataset.position = String(position);
-      node[gorupId] = groupId;
+      node[groupIdKey] = groupId;
       orderedPosition.substitution(groupId, parameter.position, position);
     },
     destroy() {
