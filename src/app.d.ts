@@ -1,5 +1,5 @@
 type DropPositionEvent = CustomEvent<{
-  id: number;
+  siblingId: number;
   position: number;
 }>;
 

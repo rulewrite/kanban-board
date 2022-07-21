@@ -127,15 +127,13 @@
   }
 
   function dropPosition(event: DropPositionEvent) {
-    const sectionId = card.postId;
-    const draggingCardId = event.detail.id;
-    const draggingCardSectionId = $cards[draggingCardId].postId;
+    const movedSectionId = $cards[event.detail.siblingId].postId;
 
     updateUnsubscribe = cardApi
       .update({
-        id: draggingCardId,
+        id,
         body: {
-          postId: sectionId,
+          postId: movedSectionId,
           position: event.detail.position,
         },
       })
@@ -148,22 +146,16 @@
           return;
         }
 
-        if (sectionId === draggingCardSectionId) {
+        if (sectionId === movedSectionId) {
           return;
         }
 
-        sections.updateEntity(sectionId, ({ comments, ...section }) => {
-          return { ...section, comments: uniq([...comments, draggingCardId]) };
+        sections.updateEntity(movedSectionId, ({ comments, ...section }) => {
+          return { ...section, comments: uniq([...comments, id]) };
         });
-        sections.updateEntity(
-          draggingCardSectionId,
-          ({ comments, ...section }) => {
-            return {
-              ...section,
-              comments: comments.filter((id) => id !== draggingCardId),
-            };
-          }
-        );
+        sections.updateEntity(sectionId, ({ comments, ...section }) => {
+          return { ...section, comments: comments.filter((i) => i !== id) };
+        });
       });
   }
 

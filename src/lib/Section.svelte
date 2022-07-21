@@ -137,7 +137,7 @@
   function dropPosition(event: DropPositionEvent) {
     updateUnsubscribe = sectionApi
       .update({
-        id: event.detail.id,
+        id,
         body: {
           position: event.detail.position,
         },

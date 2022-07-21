@@ -1,11 +1,11 @@
 import OrderedPosition, { Id, Position } from './OrderedPosition';
-import { dragenter, draggable, dragging } from './style';
+import { draggable, dragging } from './style';
 
-const format = 'text/plain';
 const groupIdKey = Symbol('groupId');
 const orderedPosition = new OrderedPosition();
 
-let currentGroupid: Id = null;
+let $dragging: HTMLElement = null;
+let $sibling: HTMLElement = null;
 
 export interface Arrangeable {
   position: Position;
@@ -25,15 +25,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.stopPropagation();
 
       event.currentTarget.classList.add(dragging);
-
-      const { id, position } = event.currentTarget.dataset;
-      currentGroupid = event.currentTarget[groupIdKey];
-
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData(
-        format,
-        JSON.stringify({ id: Number(id), position: Number(position) })
-      );
+      $dragging = event.currentTarget;
     },
   ],
   [
@@ -43,6 +35,8 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.stopPropagation();
 
       event.currentTarget.classList.remove(dragging);
+      $dragging = null;
+      $sibling = null;
     },
   ],
   [
@@ -51,33 +45,20 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DragEventTargetElement) => {
       event.stopPropagation();
 
-      if (currentGroupid !== event.currentTarget[groupIdKey]) {
+      if ($dragging === event.currentTarget) {
         return;
       }
 
-      if (event.currentTarget.classList.contains(dragenter)) {
+      if ($dragging[groupIdKey] !== event.currentTarget[groupIdKey]) {
         return;
       }
 
-      event.currentTarget.classList.add(dragenter);
-    },
-  ],
-  [
-    // 드래그 중인 대상이 적합한 드롭 대상에서 벗어났을 때
-    'dragleave',
-    (event: DragEventTargetElement) => {
-      event.stopPropagation();
-
-      const rect = event.currentTarget.getBoundingClientRect();
-
-      if (
-        event.clientX <= rect.left ||
-        event.clientX >= rect.right ||
-        event.clientY <= rect.top ||
-        event.clientY >= rect.bottom
-      ) {
-        event.currentTarget.classList.remove(dragenter);
-      }
+      $sibling = event.currentTarget;
+      const isNext = $sibling.nextElementSibling === $dragging;
+      $sibling.parentNode.insertBefore(
+        $dragging,
+        isNext ? $sibling : $sibling.nextElementSibling
+      );
     },
   ],
   [
@@ -105,30 +86,23 @@ const mapEventTypeToListener = new Map<string, EventListener>([
        */
       event.preventDefault();
       event.stopPropagation();
-      event.currentTarget.classList.remove(dragenter);
 
-      const draggingTarget: Arrangeable = JSON.parse(
-        event.dataTransfer.getData(format)
-      );
-      const $dropTarget = event.currentTarget;
-
-      if (currentGroupid !== $dropTarget[groupIdKey]) {
-        return false;
+      if (!$sibling) {
+        return;
       }
 
-      const position = Number($dropTarget.dataset.position);
-      if (draggingTarget.position === position) {
-        return false;
+      if (event.currentTarget !== $dragging) {
+        return;
       }
 
-      $dropTarget.dispatchEvent(
+      $dragging.dispatchEvent(
         new CustomEvent<DropPositionEvent['detail']>('dropPosition', {
           detail: {
-            id: draggingTarget.id,
+            siblingId: Number($sibling.dataset.id),
             position: orderedPosition.getBetween(
-              currentGroupid,
-              draggingTarget.position < position,
-              position
+              $dragging[groupIdKey],
+              $dragging.previousElementSibling === $sibling,
+              Number($sibling.dataset.position)
             ),
           },
         })
