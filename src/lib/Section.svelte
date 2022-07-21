@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+  const groupId = Symbol('sectionsArrange');
+</script>
+
 <script lang="ts">
   import Button, { Group, Label } from '@smui/button';
   import Paper, { Content, Subtitle, Title } from '@smui/paper';
@@ -154,6 +158,7 @@
   class="placeholder"
   use:arrange={section
     ? {
+        groupId,
         id: section.id,
         position: section.position,
         updatePosition,

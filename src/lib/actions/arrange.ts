@@ -25,6 +25,8 @@ injectGlobal`
 export const arrangeUnit = 65535;
 const format = 'text/plain';
 const updatePositionEventName = 'updatePosition';
+const gorupId = Symbol('gorupId');
+let currentGroupid: Symbol = null;
 
 export interface Arrangeable {
   position: number;
@@ -49,6 +51,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.currentTarget.classList.add(dragging);
 
       const { id, position } = event.currentTarget.dataset;
+      currentGroupid = event.currentTarget[gorupId];
 
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer.setData(
@@ -71,6 +74,10 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     'dragenter',
     (event: DragEventTargetElement) => {
       event.stopPropagation();
+
+      if (currentGroupid !== event.currentTarget[gorupId]) {
+        return;
+      }
 
       event.currentTarget.classList.add(dragenter);
     },
@@ -116,6 +123,10 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       );
       const $dropTarget = event.currentTarget;
 
+      if (currentGroupid !== $dropTarget[gorupId]) {
+        return false;
+      }
+
       const position = Number($dropTarget.dataset.position);
       if (draggingTarget.position === position) {
         return false;
@@ -144,6 +155,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
 ] as const);
 
 interface Parameter extends DraggingTarget {
+  groupId: typeof currentGroupid;
   updatePosition: EventListener;
 }
 
@@ -155,10 +167,11 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
   node.setAttribute('draggable', 'true');
   node.classList.add(draggable);
 
-  const { id, position, updatePosition } = parameter;
+  const { id, position, groupId, updatePosition } = parameter;
 
   node.dataset.id = String(id);
   node.dataset.position = String(position);
+  node[gorupId] = groupId;
 
   node.addEventListener(updatePositionEventName, updatePosition);
   mapEventTypeToListener.forEach((listener, eventType) => {
@@ -166,9 +179,10 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
   });
 
   return {
-    update({ id, position, updatePosition }: Parameter) {
+    update({ id, position, groupId, updatePosition }: Parameter) {
       node.dataset.id = String(id);
       node.dataset.position = String(position);
+      node[gorupId] = groupId;
 
       node.removeEventListener(updatePositionEventName, updatePosition);
       node.addEventListener(updatePositionEventName, updatePosition);

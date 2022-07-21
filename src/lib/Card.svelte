@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+  const groupId = Symbol('cardsArrange');
+</script>
+
 <script lang="ts">
   import Button, { Label } from '@smui/button';
   import Card, { Actions, Content } from '@smui/card';
@@ -149,6 +153,7 @@
   class="wrapper"
   use:arrange={card
     ? {
+        groupId,
         id: card.id,
         position: card.position,
         updatePosition,
