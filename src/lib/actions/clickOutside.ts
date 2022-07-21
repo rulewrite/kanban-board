@@ -3,9 +3,13 @@ interface MouseEventTargetElement extends MouseEvent {
   currentTarget: HTMLElement;
 }
 
-export function clickOutside(node: HTMLElement) {
+export function clickOutside(node: HTMLElement, exceptDataset?: string) {
   const handleClick = (event: MouseEventTargetElement) => {
     if (node.contains(event.target)) {
+      return;
+    }
+
+    if (exceptDataset && event.target.closest(`[${exceptDataset}]`)) {
       return;
     }
 

@@ -20,6 +20,7 @@
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
+  const exceptClickOutsideDataset = 'data-except-click-outside';
 </script>
 
 <script lang="ts">
@@ -176,7 +177,7 @@
 
     {#if isEdit}
       <Content
-        use={[clickOutside]}
+        use={[[clickOutside, exceptClickOutsideDataset]]}
         on:outClick={() => {
           toggleEdit();
         }}
@@ -204,7 +205,7 @@
     {/if}
 
     {#if isEdit}
-      <Content>
+      <Content {...{ [exceptClickOutsideDataset]: true }}>
         <Group variant="unelevated">
           {#if section}
             <Button on:click={deleteSection} color="secondary">
