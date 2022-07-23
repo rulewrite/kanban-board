@@ -86,10 +86,6 @@ const mapEventTypeToListener = new Map<string, EventListener>([
         return;
       }
 
-      if (event.currentTarget !== $dragging) {
-        return;
-      }
-
       $dragging.dispatchEvent(
         new CustomEvent<DropPositionEvent['detail']>('dropPosition', {
           detail: {
