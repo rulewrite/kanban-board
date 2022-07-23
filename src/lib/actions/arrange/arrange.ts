@@ -12,16 +12,11 @@ export interface Arrangeable {
   id: number;
 }
 
-interface DragEventTargetElement extends DragEvent {
-  target: HTMLElement;
-  currentTarget: HTMLElement;
-}
-
 const mapEventTypeToListener = new Map<string, EventListener>([
   [
     // 엘리먼트나 텍스트 블록을 드래그하기 시작할 때
     'dragstart',
-    (event: DragEventTargetElement) => {
+    (event: HTMLElementIncludeDragEvent) => {
       event.stopPropagation();
 
       event.currentTarget.classList.add(dragging);
@@ -31,7 +26,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   [
     // 드래그가 끝났을 때 (마우스 버튼을 떼거나 ESC 키를 누를 때)
     'dragend',
-    (event: DragEventTargetElement) => {
+    (event: HTMLElementIncludeDragEvent) => {
       event.stopPropagation();
 
       event.currentTarget.classList.remove(dragging);
@@ -42,7 +37,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   [
     // 드래그 중인 대상이 적합한 드롭 대상위에 올라갔을 때
     'dragenter',
-    (event: DragEventTargetElement) => {
+    (event: HTMLElementIncludeDragEvent) => {
       event.stopPropagation();
 
       if ($dragging === event.currentTarget) {
@@ -64,7 +59,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   [
     // 드래그 중인 대상이 적합한 드롭 대상 위에 있을 때 (수백 ms 마다 발생)
     'dragover',
-    (event: DragEventTargetElement) => {
+    (event: HTMLElementIncludeDragEvent) => {
       /**
        * https://developer.mozilla.org/ko/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets
        * 앱의 대부분의 영역은 적합한 드롭 대상이 아니므로 기본적으로 드롭을 허용하지 않도록 되어있음
@@ -78,7 +73,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   [
     // 드래그 중인 대상을 적합한 드롭 대상에 드롭했을 때
     'drop',
-    (event: DragEventTargetElement) => {
+    (event: HTMLElementIncludeDragEvent) => {
       /**
        * https://developer.mozilla.org/ko/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
        * 웹페지에서 드롭을 수락한 경우 기본 브라우저의 처리도 막아야 함.
