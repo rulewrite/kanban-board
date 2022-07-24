@@ -132,7 +132,7 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
       node.dataset.id = String(id);
       node.dataset.position = String(position);
       node[groupIdKey] = groupId;
-      orderedPosition.substitution(groupId, parameter.position, position);
+      orderedPosition.replace(groupId, parameter.position, position);
     },
     destroy() {
       mapEventTypeToListener.forEach((listener, eventType) => {

@@ -34,6 +34,22 @@ class OrderedPosition {
     this.set(groupId, positions);
   }
 
+  remove(groupId: Id, position: Position) {
+    this.set(
+      groupId,
+      this.getWithInitial(groupId).filter((p) => p !== position)
+    );
+  }
+
+  replace(groupId: Id, position: Position, replacePosition: Position) {
+    if (position === replacePosition) {
+      return;
+    }
+
+    this.remove(groupId, position);
+    this.add(groupId, replacePosition);
+  }
+
   getBetween(groupId: Id, isNext: boolean, position: Position) {
     const positions = this.getWithInitial(groupId);
 
@@ -46,18 +62,6 @@ class OrderedPosition {
 
     const prevPosition = positions[index + (isNext ? 1 : -1)] ?? 0;
     return (prevPosition + position) / 2;
-  }
-
-  substitution(groupId: Id, position: Position, nextPosition: Position) {
-    if (position === nextPosition) {
-      return;
-    }
-
-    const positions = this.getWithInitial(groupId).filter(
-      (p) => p !== position
-    );
-    positions.push(nextPosition);
-    this.set(groupId, positions);
   }
 }
 
