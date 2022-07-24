@@ -49,20 +49,23 @@
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
   let deleteUnsubscribe: Unsubscriber;
+  const unsubscribers: Array<Unsubscriber> = [
+    editSectionId.subscribe(async (id) => {
+      if (id !== editId) {
+        return;
+      }
 
-  async function toggleEdit() {
+      title = section?.title ?? '';
+      body = section?.body ?? '';
+
+      await tick();
+
+      titleInput?.focus();
+    }),
+  ];
+
+  function toggleEdit() {
     editSectionId.toggle(editId);
-
-    if (isEdit) {
-      return;
-    }
-
-    title = section?.title ?? '';
-    body = section?.body ?? '';
-
-    await tick();
-
-    titleInput?.focus();
   }
 
   function validate() {
@@ -188,6 +191,7 @@
     createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
     deleteUnsubscribe && deleteUnsubscribe();
+    unsubscribers.forEach((unsubscriber) => unsubscriber());
   });
 </script>
 

@@ -35,19 +35,22 @@
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
   let deleteUnsubscribe: Unsubscriber;
+  const unsubscribers: Array<Unsubscriber> = [
+    editCardId.subscribe(async (id) => {
+      if (id !== editId) {
+        return;
+      }
 
-  async function toggleEdit() {
+      body = card?.body ?? '';
+
+      await tick();
+
+      bodyInput?.focus();
+    }),
+  ];
+
+  function toggleEdit() {
     editCardId.toggle(editId);
-
-    if (isEdit) {
-      return;
-    }
-
-    body = card?.body ?? '';
-
-    await tick();
-
-    bodyInput?.focus();
   }
 
   function validate() {
@@ -166,6 +169,7 @@
     createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
     deleteUnsubscribe && deleteUnsubscribe();
+    unsubscribers.forEach((unsubscriber) => unsubscriber());
   });
 </script>
 
