@@ -9,18 +9,22 @@
   import type { Unsubscriber } from 'svelte/store';
   import { arrange } from './actions/arrange/arrange';
   import { clickOutside } from './actions/clickOutside';
+  import { droppable, Parameter } from './actions/droppable';
   import { Section, sectionApi } from './api/jsonPlaceholder';
-  import Card from './Card.svelte';
+  import Card, { groupId as cardGroupId } from './Card.svelte';
   import IdBadge from './IdBadge.svelte';
   import { createEditId } from './store/editId';
   import { isDeleted, mapKeyToEntities } from './store/entities';
 
-  const groupId = Symbol('sectionsArrange');
-  const editSectionId = createEditId();
-
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
+
+  const groupId = Symbol('sectionsArrange');
+  const editSectionId = createEditId();
   const exceptClickOutsideDataset = 'data-except-click-outside';
+  const dragenter: Parameter['dragenter'] = (event, $dragging) => {
+    event.currentTarget.appendChild($dragging);
+  };
 </script>
 
 <script lang="ts">
@@ -154,6 +158,32 @@
       });
   }
 
+  function createSectionWithCard(event: DropEntityEvent) {
+    const cardId = event.detail.id;
+
+    createUnsubscribe = sectionApi
+      .create({ body: { comments: [cardId] } })
+      .subscribe(async ({ isFetching, failMessage, id }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+
+        dispatch('createdId', id);
+        const card = cardEntities[cardId];
+        sections.updateEntity(card.postId, ({ comments, ...seciton }) => {
+          return {
+            ...seciton,
+            comments: comments.filter((id) => id !== cardId),
+          };
+        });
+        editSectionId.toggle(String(id));
+      });
+  }
+
   onDestroy(() => {
     createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
@@ -172,7 +202,10 @@
     : null}
   on:dropPosition={dropPosition}
 >
-  <Paper>
+  <Paper
+    use={[[droppable, section ? null : { groupId: cardGroupId, dragenter }]]}
+    on:dropEntity={createSectionWithCard}
+  >
     <IdBadge {id} />
 
     {#if isEdit}

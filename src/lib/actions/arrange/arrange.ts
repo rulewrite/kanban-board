@@ -1,10 +1,10 @@
 import OrderedPosition, { Id, Position } from './OrderedPosition';
 import { draggable, dragging } from './style';
 
-const groupIdKey = Symbol('groupId');
+export const groupIdKey = Symbol('groupId');
 const orderedPosition = new OrderedPosition();
 
-let $dragging: HTMLElement = null;
+export let $dragging: HTMLElement = null;
 let $sibling: HTMLElement = null;
 
 export interface Arrangeable {

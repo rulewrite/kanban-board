@@ -13,7 +13,7 @@
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
 
-  const groupId = Symbol('cardsArrange');
+  export const groupId = Symbol('cardsArrange');
   const editCardId = createEditId();
 
   const sections = mapKeyToEntities.sections;
