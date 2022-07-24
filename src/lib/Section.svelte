@@ -165,8 +165,8 @@
     const cardId = event.detail.id;
 
     createUnsubscribe = sectionApi
-      .create({ body: { comments: [cardId] } })
-      .subscribe(({ isFetching, failMessage, id }) => {
+      .create({ body: { title: 'title', comments: [cardId] } })
+      .subscribe(async ({ isFetching, failMessage, id }) => {
         if (isFetching) {
           return;
         }
@@ -183,6 +183,9 @@
             comments: comments.filter((id) => id !== cardId),
           };
         });
+
+        await tick();
+
         editSectionId.toggle(String(id));
       });
   }
@@ -235,7 +238,7 @@
     {:else if section}
       <div on:click={toggleEdit}>
         <Title>{section.title}</Title>
-        <Subtitle>{section.body}</Subtitle>
+        <Subtitle>{section.body ?? ''}</Subtitle>
       </div>
     {/if}
 
