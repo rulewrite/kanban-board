@@ -163,7 +163,7 @@
 
     createUnsubscribe = sectionApi
       .create({ body: { comments: [cardId] } })
-      .subscribe(async ({ isFetching, failMessage, id }) => {
+      .subscribe(({ isFetching, failMessage, id }) => {
         if (isFetching) {
           return;
         }
@@ -211,9 +211,7 @@
     {#if isEdit}
       <Content
         use={[[clickOutside, exceptClickOutsideDataset]]}
-        on:outClick={() => {
-          toggleEdit();
-        }}
+        on:outClick={toggleEdit}
       >
         <Textfield
           bind:this={titleInput}
