@@ -13,11 +13,11 @@
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
 
-  export const groupId = Symbol('cardsArrange');
-  const editCardId = createEditId();
-
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
+
+  export const groupId = Symbol('cardsArrange');
+  const editCardId = createEditId();
 </script>
 
 <script lang="ts">
