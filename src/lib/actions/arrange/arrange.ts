@@ -135,6 +135,8 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
       orderedPosition.replace(groupId, parameter.position, position);
     },
     destroy() {
+      orderedPosition.remove(groupId, Number(node.dataset.position));
+
       mapEventTypeToListener.forEach((listener, eventType) => {
         node.removeEventListener(eventType, listener);
       });
