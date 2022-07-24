@@ -137,7 +137,7 @@
           position: event.detail.position,
         },
       })
-      .subscribe(({ isFetching, failMessage }) => {
+      .subscribe(async ({ isFetching, failMessage }) => {
         if (isFetching) {
           return;
         }
@@ -150,11 +150,14 @@
           return;
         }
 
-        sections.updateEntity(movedSectionId, ({ comments, ...section }) => {
-          return { ...section, comments: uniq([...comments, id]) };
-        });
         sections.updateEntity(sectionId, ({ comments, ...section }) => {
           return { ...section, comments: comments.filter((i) => i !== id) };
+        });
+
+        await tick();
+
+        sections.updateEntity(movedSectionId, ({ comments, ...section }) => {
+          return { ...section, comments: uniq([...comments, id]) };
         });
       });
   }
