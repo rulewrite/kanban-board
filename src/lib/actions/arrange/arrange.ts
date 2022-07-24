@@ -108,6 +108,12 @@ interface Parameter extends Arrangeable {
   groupId: Id;
 }
 
+const set = (node: HTMLElement, { id, position, groupId }: Parameter) => {
+  node.dataset.id = String(id);
+  node.dataset.position = String(position);
+  node[groupIdKey] = groupId;
+};
+
 export function arrange(node: HTMLElement, parameter: Parameter | null) {
   if (parameter === null) {
     return {};
@@ -116,11 +122,8 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
   node.setAttribute('draggable', 'true');
   node.classList.add(draggable);
 
-  const { id, position, groupId } = parameter;
-
-  node.dataset.id = String(id);
-  node.dataset.position = String(position);
-  node[groupIdKey] = groupId;
+  const { groupId, position } = parameter;
+  set(node, parameter);
   orderedPosition.add(groupId, position);
 
   mapEventTypeToListener.forEach((listener, eventType) => {
@@ -128,11 +131,9 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
   });
 
   return {
-    update({ id, position, groupId }: Parameter) {
-      node.dataset.id = String(id);
-      node.dataset.position = String(position);
-      node[groupIdKey] = groupId;
-      orderedPosition.replace(groupId, parameter.position, position);
+    update(updatedParameter: Parameter) {
+      set(node, updatedParameter);
+      orderedPosition.replace(groupId, position, updatedParameter.position);
     },
     destroy() {
       orderedPosition.remove(groupId, Number(node.dataset.position));
