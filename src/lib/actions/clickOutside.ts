@@ -1,9 +1,14 @@
+import type { Action } from 'svelte/action';
+
 interface MouseEventTargetElement extends MouseEvent {
   target: HTMLElement;
   currentTarget: HTMLElement;
 }
 
-export function clickOutside(node: HTMLElement, exceptDataset?: string) {
+export const clickOutside: Action<HTMLElement, string> = (
+  node,
+  exceptDataset?
+) => {
   const handleClick = (event: MouseEventTargetElement) => {
     if (node.contains(event.target)) {
       return;
@@ -23,4 +28,4 @@ export function clickOutside(node: HTMLElement, exceptDataset?: string) {
       document.removeEventListener('click', handleClick, true);
     },
   };
-}
+};

@@ -1,3 +1,5 @@
+import type { ActionReturn } from 'svelte/action';
+
 export const groupIdKey = Symbol('groupId');
 const dragstartKey = Symbol('dragstart');
 const dragendKey = Symbol('dragend');
@@ -51,7 +53,10 @@ const set = (node: HTMLElement, { groupId, dragstart, dragend }: Parameter) => {
   dragend ? (node[dragendKey] = dragend) : delete node[dragendKey];
 };
 
-export function draggable(node: HTMLElement, parameter: Parameter | null) {
+export function draggable(
+  node: HTMLElement,
+  parameter: Parameter | null
+): ActionReturn<Parameter> {
   if (!parameter) {
     return {};
   }
@@ -64,7 +69,7 @@ export function draggable(node: HTMLElement, parameter: Parameter | null) {
   });
 
   return {
-    update(updatedParameter: Parameter | null) {
+    update(updatedParameter) {
       set(node, updatedParameter);
     },
     destroy() {

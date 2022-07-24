@@ -1,3 +1,4 @@
+import type { ActionReturn } from 'svelte/action';
 import { $dragging, groupIdKey } from './draggable';
 
 const droppableGroupId = Symbol('droppableGroupId');
@@ -76,7 +77,10 @@ const set = (node: HTMLElement, { groupId, dragenter }: Parameter) => {
   dragenter ? (node[dragenterKey] = dragenter) : delete node[dragenterKey];
 };
 
-export function droppable(node: HTMLElement, parameter: Parameter | null) {
+export function droppable(
+  node: HTMLElement,
+  parameter: Parameter | null
+): ActionReturn<Parameter> {
   if (parameter === null) {
     return {};
   }
@@ -87,7 +91,7 @@ export function droppable(node: HTMLElement, parameter: Parameter | null) {
   });
 
   return {
-    update(updatedParameter: Parameter) {
+    update(updatedParameter) {
       set(node, updatedParameter);
     },
     destroy() {

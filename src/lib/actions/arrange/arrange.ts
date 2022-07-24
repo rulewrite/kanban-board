@@ -1,3 +1,4 @@
+import type { Action } from 'svelte/action';
 import {
   $dragging,
   draggable as draggableAction,
@@ -72,7 +73,10 @@ const set = (node: HTMLElement, { id, position, groupId }: Parameter) => {
   node[groupIdKey] = groupId;
 };
 
-export function arrange(node: HTMLElement, parameter: Parameter | null) {
+export const arrange: Action<HTMLElement, Parameter | null> = (
+  node,
+  parameter
+) => {
   if (parameter === null) {
     return {};
   }
@@ -113,4 +117,4 @@ export function arrange(node: HTMLElement, parameter: Parameter | null) {
       destroyDroppable();
     },
   };
-}
+};
