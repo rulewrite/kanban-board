@@ -1,4 +1,4 @@
-import { $dragging, groupIdKey } from './arrange/arrange';
+import { $dragging, groupIdKey } from './draggable';
 
 const droppableGroupId = Symbol('droppableGroupId');
 const dragenterKey = Symbol('dragenter');
