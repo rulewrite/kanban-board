@@ -2,14 +2,14 @@ import type { Action } from 'svelte/action';
 import {
   $dragging,
   draggable as draggableAction,
-  DraggableEvent,
+  DraggableHTMLElement,
   getGroupId,
   Parameter as DraggableParameter,
 } from '../draggable';
 import {
   dropEntityEventType,
   droppable,
-  DroppableEvent,
+  DroppableHTMLElement,
   Parameter as DroppableParameter,
 } from '../droppable';
 import OrderedPosition from './OrderedPosition';
@@ -17,7 +17,7 @@ import { draggable, dragging } from './style';
 
 const orderedPosition = new OrderedPosition();
 
-let $sibling: DroppableEvent['currentTarget'] = null;
+let $sibling: DroppableHTMLElement = null;
 
 const dragstart: DraggableParameter['dragstart'] = (event) => {
   event.currentTarget.classList.add(dragging);
@@ -28,15 +28,14 @@ const dragend: DraggableParameter['dragend'] = (event) => {
   $sibling = null;
 };
 
-const dragenter: DroppableParameter['dragenter'] = (
-  event: DraggableEvent & DroppableEvent,
-  $dragging
-) => {
-  if ($dragging === event.currentTarget) {
+const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
+  const $currentTarget = event.currentTarget as DroppableHTMLElement &
+    DraggableHTMLElement;
+  if ($dragging === $currentTarget) {
     return;
   }
 
-  $sibling = event.currentTarget;
+  $sibling = $currentTarget;
   const isNext = $sibling.nextElementSibling === $dragging;
   $sibling.parentNode.insertBefore(
     $dragging,

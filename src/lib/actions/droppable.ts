@@ -1,21 +1,19 @@
 import type { ActionReturn } from 'svelte/action';
-import { $dragging, DraggableEvent, getGroupId } from './draggable';
+import { $dragging, DraggableHTMLElement, getGroupId } from './draggable';
 
 export const dropEntityEventType = 'dropEntity';
 
 const props = Symbol('props');
 
-export type DroppableEvent = HTMLElementIncludeDragEvent<{
+type DroppableEvent = HTMLElementIncludeDragEvent<{
   [props]: {
     groupId: Symbol;
-    dragenter?: (
-      e: DroppableEvent,
-      $dragging: DraggableEvent['currentTarget']
-    ) => void;
+    dragenter?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
   };
 }>;
+export type DroppableHTMLElement = DroppableEvent['currentTarget'];
 
-let $dragenter: DroppableEvent['currentTarget'] = null;
+let $dragenter: DroppableHTMLElement = null;
 
 // 드래그 중인 대상이 적합한 드롭 대상 위에 있을 때 (수백 ms 마다 발생)
 document.addEventListener('dragover', (event: DroppableEvent) => {
@@ -72,7 +70,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   ],
 ] as const);
 
-export type Parameter = DroppableEvent['currentTarget'][typeof props];
+export type Parameter = DroppableHTMLElement[typeof props];
 
 const set = (node: HTMLElement, { groupId, dragenter }: Parameter) => {
   node[props] = { groupId, dragenter };

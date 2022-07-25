@@ -2,16 +2,16 @@ import type { ActionReturn } from 'svelte/action';
 
 const props = Symbol('props');
 
-export type DraggableEvent = HTMLElementIncludeDragEvent<{
+type DraggableEvent = HTMLElementIncludeDragEvent<{
   [props]: {
     groupId: Symbol;
     dragstart?: (e: DraggableEvent) => void;
     dragend?: (e: DraggableEvent) => void;
   };
 }>;
+export type DraggableHTMLElement = DraggableEvent['currentTarget'];
 
-export let $dragging: DraggableEvent['currentTarget'] = null;
-
+export let $dragging: DraggableHTMLElement = null;
 export const getGroupId = () => $dragging[props].groupId;
 
 const mapEventTypeToListener = new Map<string, EventListener>([
@@ -37,7 +37,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   ],
 ] as const);
 
-export type Parameter = DraggableEvent['currentTarget'][typeof props];
+export type Parameter = DraggableHTMLElement[typeof props];
 
 const set = (node: HTMLElement, { groupId, dragstart, dragend }: Parameter) => {
   node[props] = { groupId, dragstart, dragend };
