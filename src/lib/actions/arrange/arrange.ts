@@ -17,7 +17,7 @@ import { draggable, dragging } from './style';
 
 const orderedPosition = new OrderedPosition();
 
-let $sibling: HTMLElement = null;
+let $sibling: DroppableEvent['currentTarget'] = null;
 
 const dragstart: DraggableParameter['dragstart'] = (event) => {
   event.currentTarget.classList.add(dragging);
