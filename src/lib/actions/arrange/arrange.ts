@@ -2,12 +2,14 @@ import type { Action } from 'svelte/action';
 import {
   $dragging,
   draggable as draggableAction,
+  DraggableEvent,
   getGroupId,
   Parameter as DraggableParameter,
 } from '../draggable';
 import {
   dropEntityEventType,
   droppable,
+  DroppableEvent,
   Parameter as DroppableParameter,
 } from '../droppable';
 import OrderedPosition from './OrderedPosition';
@@ -26,7 +28,10 @@ const dragend: DraggableParameter['dragend'] = (event) => {
   $sibling = null;
 };
 
-const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
+const dragenter: DroppableParameter['dragenter'] = (
+  event: DraggableEvent & DroppableEvent,
+  $dragging
+) => {
   if ($dragging === event.currentTarget) {
     return;
   }

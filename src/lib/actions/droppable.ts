@@ -1,14 +1,17 @@
 import type { ActionReturn } from 'svelte/action';
-import { $dragging, getGroupId } from './draggable';
+import { $dragging, DraggableEvent, getGroupId } from './draggable';
 
 export const dropEntityEventType = 'dropEntity';
 
 const props = Symbol('props');
 
-type DroppableEvent = HTMLElementIncludeDragEvent<{
+export type DroppableEvent = HTMLElementIncludeDragEvent<{
   [props]: {
     groupId: Symbol;
-    dragenter?: (e: DroppableEvent, $dragging: HTMLElement) => void;
+    dragenter?: (
+      e: DroppableEvent,
+      $dragging: DraggableEvent['currentTarget']
+    ) => void;
   };
 }>;
 

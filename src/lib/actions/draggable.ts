@@ -2,7 +2,7 @@ import type { ActionReturn } from 'svelte/action';
 
 const props = Symbol('props');
 
-type DraggableEvent = HTMLElementIncludeDragEvent<{
+export type DraggableEvent = HTMLElementIncludeDragEvent<{
   [props]: {
     groupId: Symbol;
     dragstart?: (e: DraggableEvent) => void;
