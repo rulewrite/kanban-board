@@ -1,14 +1,20 @@
 import type { ActionReturn } from 'svelte/action';
 import { $dragging, getGroupId } from './draggable';
 
-const groupIdKey = Symbol('groupId');
-const dragenterKey = Symbol('dragenter');
 export const dropEntityEventType = 'dropEntity';
 
-let $dragenter: HTMLElement = null;
+const groupIdKey = Symbol('groupId');
+const dragenterKey = Symbol('dragenter');
+
+type DroppableEvent = HTMLElementIncludeDragEvent<{
+  [groupIdKey]: Symbol;
+  [dragenterKey]?: (e: DroppableEvent, $dragging: HTMLElement) => void;
+}>;
+
+let $dragenter: DroppableEvent['currentTarget'] = null;
 
 // 드래그 중인 대상이 적합한 드롭 대상 위에 있을 때 (수백 ms 마다 발생)
-document.addEventListener('dragover', (event: HTMLElementIncludeDragEvent) => {
+document.addEventListener('dragover', (event: DroppableEvent) => {
   /**
    * https://developer.mozilla.org/ko/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets
    * 앱의 대부분의 영역은 적합한 드롭 대상이 아니므로 기본적으로 드롭을 허용하지 않도록 되어있음
@@ -20,7 +26,7 @@ document.addEventListener('dragover', (event: HTMLElementIncludeDragEvent) => {
 });
 
 // 드래그 중인 대상을 적합한 드롭 대상에 드롭했을 때
-document.addEventListener('drop', (event: HTMLElementIncludeDragEvent) => {
+document.addEventListener('drop', (event: DroppableEvent) => {
   /**
    * https://developer.mozilla.org/ko/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
    * 웹페지에서 드롭을 수락한 경우 기본 브라우저의 처리도 막아야 함.
@@ -48,7 +54,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
   [
     // 드래그 중인 대상이 적합한 드롭 대상위에 올라갔을 때
     'dragenter',
-    (event: HTMLElementIncludeDragEvent) => {
+    (event: DroppableEvent) => {
       event.stopPropagation();
 
       const $currentTarget = event.currentTarget;
@@ -57,19 +63,14 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       }
 
       $dragenter = $currentTarget;
-      const dragenter = $currentTarget[dragenterKey];
-      if (!dragenter) {
-        return;
-      }
-
-      dragenter(event, $dragging);
+      $dragenter?.[dragenterKey](event, $dragging);
     },
   ],
 ] as const);
 
 export interface Parameter {
-  groupId: Symbol;
-  dragenter?: (e: HTMLElementIncludeDragEvent, $dragging: HTMLElement) => void;
+  groupId: DroppableEvent['currentTarget'][typeof groupIdKey];
+  dragenter?: DroppableEvent['currentTarget'][typeof dragenterKey];
 }
 
 const set = (node: HTMLElement, { groupId, dragenter }: Parameter) => {

@@ -4,49 +4,43 @@ const groupIdKey = Symbol('groupId');
 const dragstartKey = Symbol('dragstart');
 const dragendKey = Symbol('dragend');
 
-export let $dragging: HTMLElement = null;
+type DraggableEvent = HTMLElementIncludeDragEvent<{
+  [groupIdKey]: Symbol;
+  [dragstartKey]?: (e: DraggableEvent) => void;
+  [dragendKey]?: (e: DraggableEvent) => void;
+}>;
 
-export const getGroupId = () => $dragging[groupIdKey] as Symbol;
+export let $dragging: DraggableEvent['currentTarget'] = null;
+
+export const getGroupId = () => $dragging[groupIdKey];
 
 const mapEventTypeToListener = new Map<string, EventListener>([
   [
     // 엘리먼트나 텍스트 블록을 드래그하기 시작할 때
     'dragstart',
-    (event: HTMLElementIncludeDragEvent) => {
+    (event: DraggableEvent) => {
       event.stopPropagation();
 
       $dragging = event.currentTarget;
-
-      const dragstart = $dragging[dragstartKey];
-      if (!dragstart) {
-        return;
-      }
-
-      dragstart(event);
+      $dragging?.[dragstartKey](event);
     },
   ],
   [
     // 드래그가 끝났을 때 (마우스 버튼을 떼거나 ESC 키를 누를 때)
     'dragend',
-    (event: HTMLElementIncludeDragEvent) => {
+    (event: DraggableEvent) => {
       event.stopPropagation();
 
       $dragging = null;
-
-      const dragend = event.currentTarget[dragendKey];
-      if (!dragend) {
-        return;
-      }
-
-      dragend(event);
+      event.currentTarget?.[dragendKey](event);
     },
   ],
 ] as const);
 
 export interface Parameter {
-  groupId: Symbol;
-  dragstart?: (e: HTMLElementIncludeDragEvent) => void;
-  dragend?: (e: HTMLElementIncludeDragEvent) => void;
+  groupId: DraggableEvent['currentTarget'][typeof groupIdKey];
+  dragstart?: DraggableEvent['currentTarget'][typeof dragstartKey];
+  dragend?: DraggableEvent['currentTarget'][typeof dragendKey];
 }
 
 const set = (node: HTMLElement, { groupId, dragstart, dragend }: Parameter) => {
