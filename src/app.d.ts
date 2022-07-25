@@ -1,5 +1,4 @@
 interface HTMLElementIncludeDragEvent extends DragEvent {
-  target: HTMLElement;
   currentTarget: HTMLElement;
 }
 
