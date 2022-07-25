@@ -1,9 +1,7 @@
 import { uniq } from 'lodash-es';
 
-export type Id = Symbol;
-
-export type Position = number;
-
+type Id = Symbol;
+type Position = number;
 export const arrangeUnit = 65535;
 
 class OrderedPosition {

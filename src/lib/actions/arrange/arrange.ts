@@ -10,7 +10,7 @@ import {
   droppable,
   Parameter as DroppableParameter,
 } from '../droppable';
-import OrderedPosition, { Id, Position } from './OrderedPosition';
+import OrderedPosition from './OrderedPosition';
 import { draggable, dragging } from './style';
 
 const orderedPosition = new OrderedPosition();
@@ -59,18 +59,17 @@ const handleDropEntity = () => {
 };
 
 export interface Arrangeable {
-  position: Position;
+  position: number;
   id: number;
 }
 
 interface Parameter extends Arrangeable {
-  groupId: Id;
+  groupId: Symbol;
 }
 
-const set = (node: HTMLElement, { id, position, groupId }: Parameter) => {
+const set = (node: HTMLElement, { id, position }: Parameter) => {
   node.dataset.id = String(id);
   node.dataset.position = String(position);
-  node[groupIdKey] = groupId;
 };
 
 export const arrange: Action<HTMLElement, Parameter | null> = (
