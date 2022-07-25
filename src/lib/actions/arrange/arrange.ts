@@ -2,7 +2,7 @@ import type { Action } from 'svelte/action';
 import {
   $dragging,
   draggable as draggableAction,
-  groupIdKey,
+  getGroupId,
   Parameter as DraggableParameter,
 } from '../draggable';
 import {
@@ -49,7 +49,7 @@ const handleDropEntity = () => {
       detail: {
         siblingId: Number($sibling.dataset.id),
         position: orderedPosition.getBetween(
-          $dragging[groupIdKey],
+          getGroupId(),
           $dragging.previousElementSibling === $sibling,
           Number($sibling.dataset.position)
         ),

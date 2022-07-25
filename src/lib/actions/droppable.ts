@@ -1,7 +1,7 @@
 import type { ActionReturn } from 'svelte/action';
-import { $dragging, groupIdKey } from './draggable';
+import { $dragging, getGroupId } from './draggable';
 
-const droppableGroupId = Symbol('droppableGroupId');
+const groupIdKey = Symbol('groupId');
 const dragenterKey = Symbol('dragenter');
 export const dropEntityEventType = 'dropEntity';
 
@@ -33,7 +33,7 @@ document.addEventListener('drop', (event: HTMLElementIncludeDragEvent) => {
     return;
   }
 
-  if ($dragging[groupIdKey] !== $dragenter[droppableGroupId]) {
+  if (getGroupId() !== $dragenter[groupIdKey]) {
     return;
   }
 
@@ -52,7 +52,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.stopPropagation();
 
       const $currentTarget = event.currentTarget;
-      if ($dragging[groupIdKey] !== $currentTarget[droppableGroupId]) {
+      if (getGroupId() !== $currentTarget[groupIdKey]) {
         return;
       }
 
@@ -73,7 +73,7 @@ export interface Parameter {
 }
 
 const set = (node: HTMLElement, { groupId, dragenter }: Parameter) => {
-  node[droppableGroupId] = groupId;
+  node[groupIdKey] = groupId;
   dragenter ? (node[dragenterKey] = dragenter) : delete node[dragenterKey];
 };
 

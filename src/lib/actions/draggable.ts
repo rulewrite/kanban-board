@@ -1,10 +1,12 @@
 import type { ActionReturn } from 'svelte/action';
 
-export const groupIdKey = Symbol('groupId');
+const groupIdKey = Symbol('groupId');
 const dragstartKey = Symbol('dragstart');
 const dragendKey = Symbol('dragend');
 
 export let $dragging: HTMLElement = null;
+
+export const getGroupId = () => $dragging[groupIdKey] as Symbol;
 
 const mapEventTypeToListener = new Map<string, EventListener>([
   [
