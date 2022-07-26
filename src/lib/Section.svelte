@@ -19,7 +19,7 @@
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
 
-  const groupId = Symbol('sectionsArrange');
+  export const groupId = Symbol('sectionsArrange');
   const editSectionId = createEditId();
   const exceptClickOutsideDataset = 'data-except-click-outside';
   const dragenter: Parameter['dragenter'] = (event, $dragging) => {
