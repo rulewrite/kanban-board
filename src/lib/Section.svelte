@@ -161,8 +161,8 @@
       });
   }
 
-  function createSectionWithCard(event: DropEntityEvent) {
-    const cardId = event.detail.id;
+  const createSectionWithCard: Parameter['drop'] = (e, dragging) => {
+    const cardId = dragging.getProps().id;
 
     createUnsubscribe = sectionApi
       .create({ body: { title: 'title', comments: [cardId] } })
@@ -188,7 +188,7 @@
 
         editSectionId.toggle(String(id));
       });
-  }
+  };
 
   onDestroy(() => {
     createUnsubscribe && createUnsubscribe();
@@ -210,8 +210,14 @@
   on:dropPosition={dropPosition}
 >
   <Paper
-    use={[[droppable, section ? null : { groupIds: [cardGroupId], dragenter }]]}
-    on:dropEntity={createSectionWithCard}
+    use={[
+      [
+        droppable,
+        section
+          ? null
+          : { groupIds: [cardGroupId], dragenter, drop: createSectionWithCard },
+      ],
+    ]}
   >
     <IdBadge {id} />
 

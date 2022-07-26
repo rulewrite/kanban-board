@@ -3,12 +3,11 @@ import { get } from 'svelte/store';
 import { createPropsElement } from '../store/propsElement';
 import { DraggableHTMLElement, dragging } from './draggable';
 
-export const dropEntityEventType = 'dropEntity';
-
 export const dragentered = createPropsElement<{
   groupIds: Array<Symbol>;
   dragenter?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
   dragleave?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
+  drop?: (e: DroppableEvent, d: typeof dragging) => void;
 }>();
 
 export type DroppableHTMLElement = ReturnType<
@@ -47,11 +46,7 @@ document.addEventListener('drop', (event: DroppableEvent) => {
     return;
   }
 
-  get(dragentered).dispatchEvent(
-    new CustomEvent<DropEntityEvent['detail']>(dropEntityEventType, {
-      detail: { id: dragging.getProps().id },
-    })
-  );
+  dragentered.getProps()?.drop(event, dragging);
 });
 
 const mapEventTypeToListener = new Map<string, EventListener>([

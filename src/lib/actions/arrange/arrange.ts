@@ -3,11 +3,9 @@ import { get } from 'svelte/store';
 import {
   draggable,
   DraggableHTMLElement,
-  dragging,
   Parameter as DraggableParameter,
 } from '../draggable';
 import {
-  dropEntityEventType,
   droppable,
   DroppableHTMLElement,
   Parameter as DroppableParameter,
@@ -46,7 +44,7 @@ const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
   );
 };
 
-const handleDropEntity = () => {
+const drop: DroppableParameter['drop'] = (e, dragging) => {
   if (!$sibling) {
     return;
   }
@@ -99,10 +97,9 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
     { id, groupId, dragstart, dragend }
   );
 
-  node.addEventListener(dropEntityEventType, handleDropEntity);
   const { update: updateDroppable, destroy: destroyDroppable } = droppable(
     node,
-    { groupIds: [groupId], dragenter }
+    { groupIds: [groupId], dragenter, drop }
   );
 
   return {
@@ -119,6 +116,7 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
       updateDroppable({
         groupIds: [updatedParameter.groupId],
         dragenter,
+        drop,
       });
     },
     destroy() {
@@ -126,7 +124,6 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
 
       destoryDraggable();
 
-      node.removeEventListener(dropEntityEventType, handleDropEntity);
       destroyDroppable();
     },
   };
