@@ -6,7 +6,7 @@ import { DraggableHTMLElement, dragging } from './draggable';
 export const dropEntityEventType = 'dropEntity';
 
 export const dragentered = createPropsElement<{
-  groupId: Symbol;
+  groupIds: Array<Symbol>;
   dragenter?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
   dragleave?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
 }>();
@@ -43,7 +43,7 @@ document.addEventListener('drop', (event: DroppableEvent) => {
     return;
   }
 
-  if (dragging.getProps().groupId !== dragentered.getProps().groupId) {
+  if (!dragentered.getProps().groupIds.includes(dragging.getProps().groupId)) {
     return;
   }
 
@@ -63,8 +63,9 @@ const mapEventTypeToListener = new Map<string, EventListener>([
 
       const $currentTarget = event.currentTarget;
       if (
-        dragging.getProps().groupId !==
-        dragentered.utils.getNodeProps($currentTarget).groupId
+        !dragentered.utils
+          .getNodeProps($currentTarget)
+          .groupIds.includes(dragging.getProps().groupId)
       ) {
         return;
       }
@@ -81,8 +82,9 @@ const mapEventTypeToListener = new Map<string, EventListener>([
 
       const $currentTarget = event.currentTarget;
       if (
-        dragging.getProps().groupId !==
-        dragentered.utils.getNodeProps($currentTarget).groupId
+        !dragentered.utils
+          .getNodeProps($currentTarget)
+          .groupIds.includes(dragging.getProps().groupId)
       ) {
         return;
       }

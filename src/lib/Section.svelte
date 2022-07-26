@@ -210,7 +210,7 @@
   on:dropPosition={dropPosition}
 >
   <Paper
-    use={[[droppable, section ? null : { groupId: cardGroupId, dragenter }]]}
+    use={[[droppable, section ? null : { groupIds: [cardGroupId], dragenter }]]}
     on:dropEntity={createSectionWithCard}
   >
     <IdBadge {id} />

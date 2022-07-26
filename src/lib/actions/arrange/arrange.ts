@@ -2,6 +2,7 @@ import type { Action } from 'svelte/action';
 import { get } from 'svelte/store';
 import {
   draggable,
+  DraggableHTMLElement,
   dragging,
   Parameter as DraggableParameter,
 } from '../draggable';
@@ -31,7 +32,8 @@ const dragend: DraggableParameter['dragend'] = (event) => {
 };
 
 const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
-  const $currentTarget = event.currentTarget;
+  const $currentTarget = event.currentTarget as DroppableHTMLElement &
+    DraggableHTMLElement;
   if ($dragging === $currentTarget) {
     return;
   }
@@ -100,7 +102,7 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
   node.addEventListener(dropEntityEventType, handleDropEntity);
   const { update: updateDroppable, destroy: destroyDroppable } = droppable(
     node,
-    { groupId, dragenter }
+    { groupIds: [groupId], dragenter }
   );
 
   return {
@@ -115,7 +117,7 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
         dragend,
       });
       updateDroppable({
-        groupId: updatedParameter.groupId,
+        groupIds: [updatedParameter.groupId],
         dragenter,
       });
     },
