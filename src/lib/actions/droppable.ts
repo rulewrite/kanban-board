@@ -8,6 +8,7 @@ export const dropEntityEventType = 'dropEntity';
 export const dragentered = createPropsElement<{
   groupId: Symbol;
   dragenter?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
+  dragleave?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
 }>();
 
 export type DroppableHTMLElement = ReturnType<
@@ -70,6 +71,38 @@ const mapEventTypeToListener = new Map<string, EventListener>([
 
       dragentered.bind($currentTarget);
       dragentered.getProps()?.dragenter(event, get(dragging));
+    },
+  ],
+  [
+    // 드래그 중인 대상이 적합한 드롭 대상에서 벗어났을 때
+    'dragleave',
+    (event: DroppableEvent) => {
+      event.stopPropagation();
+
+      const $currentTarget = event.currentTarget;
+      if (
+        dragging.getProps().groupId !==
+        dragentered.utils.getNodeProps($currentTarget).groupId
+      ) {
+        return;
+      }
+
+      const dragleave =
+        dragentered.utils.getNodeProps($currentTarget).dragleave;
+      if (!dragleave) {
+        return;
+      }
+
+      const rect = event.currentTarget.getBoundingClientRect();
+
+      if (
+        event.clientX <= rect.left ||
+        event.clientX >= rect.right ||
+        event.clientY <= rect.top ||
+        event.clientY >= rect.bottom
+      ) {
+        dragleave(event, get(dragging));
+      }
     },
   ],
 ] as const);
