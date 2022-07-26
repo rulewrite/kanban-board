@@ -1,5 +1,10 @@
 import type { ActionReturn } from 'svelte/action';
-import { $dragging, DraggableHTMLElement, getGroupId } from './draggable';
+import {
+  $dragging,
+  DraggableHTMLElement,
+  getGroupId,
+  getProps,
+} from './draggable';
 
 export const dropEntityEventType = 'dropEntity';
 
@@ -47,7 +52,7 @@ document.addEventListener('drop', (event: DroppableEvent) => {
 
   $dragenter.dispatchEvent(
     new CustomEvent<DropEntityEvent['detail']>(dropEntityEventType, {
-      detail: { id: Number($dragging.dataset.id) },
+      detail: { id: getProps($dragging).id },
     })
   );
 });

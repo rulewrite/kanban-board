@@ -4,6 +4,7 @@ const props = Symbol('props');
 
 type DraggableEvent = HTMLElementIncludeDragEvent<{
   [props]: {
+    id: number;
     groupId: Symbol;
     dragstart?: (e: DraggableEvent) => void;
     dragend?: (e: DraggableEvent) => void;
@@ -12,7 +13,8 @@ type DraggableEvent = HTMLElementIncludeDragEvent<{
 export type DraggableHTMLElement = DraggableEvent['currentTarget'];
 
 export let $dragging: DraggableHTMLElement = null;
-export const getGroupId = () => $dragging[props].groupId;
+export const getProps = ($element: DraggableHTMLElement) => $element[props];
+export const getGroupId = () => getProps($dragging).groupId;
 
 const mapEventTypeToListener = new Map<string, EventListener>([
   [
@@ -39,8 +41,11 @@ const mapEventTypeToListener = new Map<string, EventListener>([
 
 export type Parameter = DraggableHTMLElement[typeof props];
 
-const set = (node: HTMLElement, { groupId, dragstart, dragend }: Parameter) => {
-  node[props] = { groupId, dragstart, dragend };
+const set = (
+  node: HTMLElement,
+  { id, groupId, dragstart, dragend }: Parameter
+) => {
+  node[props] = { id, groupId, dragstart, dragend };
 };
 
 export function draggable(

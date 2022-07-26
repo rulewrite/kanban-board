@@ -63,8 +63,8 @@ const handleDropEntity = () => {
 };
 
 export interface Arrangeable {
-  position: number;
   id: number;
+  position: number;
 }
 
 interface Parameter extends Arrangeable {
@@ -86,12 +86,12 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
 
   node.classList.add(draggable);
 
-  const { groupId, position } = parameter;
+  const { id, groupId, position } = parameter;
   set(node, parameter);
   orderedPosition.add(groupId, position);
 
   const { update: updateDraggable, destroy: destoryDraggable } =
-    draggableAction(node, { groupId, dragstart, dragend });
+    draggableAction(node, { id, groupId, dragstart, dragend });
 
   node.addEventListener(dropEntityEventType, handleDropEntity);
   const { update: updateDroppable, destroy: destroyDroppable } = droppable(
@@ -105,11 +105,15 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
       orderedPosition.replace(groupId, position, updatedParameter.position);
 
       updateDraggable({
+        id: updatedParameter.id,
         groupId: updatedParameter.groupId,
         dragstart,
         dragend,
       });
-      updateDroppable({ groupId: updatedParameter.groupId, dragenter });
+      updateDroppable({
+        groupId: updatedParameter.groupId,
+        dragenter,
+      });
     },
     destroy() {
       orderedPosition.remove(groupId, Number(node.dataset.position));
