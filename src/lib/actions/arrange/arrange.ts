@@ -1,7 +1,7 @@
 import type { Action } from 'svelte/action';
 import {
   $dragging,
-  draggable as draggableAction,
+  draggable,
   DraggableHTMLElement,
   getGroupId,
   Parameter as DraggableParameter,
@@ -13,18 +13,21 @@ import {
   Parameter as DroppableParameter,
 } from '../droppable';
 import OrderedPosition from './OrderedPosition';
-import { draggable, dragging } from './style';
+import {
+  draggable as draggableClassName,
+  dragging as draggingClassName,
+} from './style';
 
 const orderedPosition = new OrderedPosition();
 
 let $sibling: DroppableHTMLElement = null;
 
 const dragstart: DraggableParameter['dragstart'] = (event) => {
-  event.currentTarget.classList.add(dragging);
+  event.currentTarget.classList.add(draggingClassName);
 };
 
 const dragend: DraggableParameter['dragend'] = (event) => {
-  event.currentTarget.classList.remove(dragging);
+  event.currentTarget.classList.remove(draggingClassName);
   $sibling = null;
 };
 
@@ -84,14 +87,16 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
     return {};
   }
 
-  node.classList.add(draggable);
+  node.classList.add(draggableClassName);
 
   const { id, groupId, position } = parameter;
   set(node, parameter);
   orderedPosition.add(groupId, position);
 
-  const { update: updateDraggable, destroy: destoryDraggable } =
-    draggableAction(node, { id, groupId, dragstart, dragend });
+  const { update: updateDraggable, destroy: destoryDraggable } = draggable(
+    node,
+    { id, groupId, dragstart, dragend }
+  );
 
   node.addEventListener(dropEntityEventType, handleDropEntity);
   const { update: updateDroppable, destroy: destroyDroppable } = droppable(
