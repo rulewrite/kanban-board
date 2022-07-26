@@ -1,11 +1,9 @@
-<script lang="ts">
-  import LayoutGrid, { Cell } from '@smui/layout-grid';
-</script>
-
-<main>
-  <LayoutGrid>
-    <Cell span={12}>
-      <slot />
-    </Cell>
-  </LayoutGrid>
+<main id="main">
+  <slot />
 </main>
+
+<style>
+  #main {
+    padding: 24px;
+  }
+</style>
