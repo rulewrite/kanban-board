@@ -1,5 +1,5 @@
-interface HTMLElementIncludeDragEvent<T = {}> extends DragEvent {
-  currentTarget: HTMLElement & T;
+interface HTMLElementIncludeDragEvent<T extends HTMLElement> extends DragEvent {
+  currentTarget: T;
 }
 
 type DropPositionEvent = CustomEvent<{

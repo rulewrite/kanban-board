@@ -1,24 +1,20 @@
 import type { ActionReturn } from 'svelte/action';
-import {
-  $dragging,
-  DraggableHTMLElement,
-  getGroupId,
-  getProps,
-} from './draggable';
+import { get } from 'svelte/store';
+import { createPropsElement } from '../store/propsElement';
+import { DraggableHTMLElement, dragging } from './draggable';
 
 export const dropEntityEventType = 'dropEntity';
 
-const props = Symbol('props');
+export const dragentered = createPropsElement<{
+  groupId: Symbol;
+  dragenter?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
+}>();
 
-type DroppableEvent = HTMLElementIncludeDragEvent<{
-  [props]: {
-    groupId: Symbol;
-    dragenter?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
-  };
-}>;
-export type DroppableHTMLElement = DroppableEvent['currentTarget'];
+export type DroppableHTMLElement = ReturnType<
+  typeof dragentered['utils']['setNodeProps']
+>;
 
-let $dragenter: DroppableHTMLElement = null;
+type DroppableEvent = HTMLElementIncludeDragEvent<DroppableHTMLElement>;
 
 // 드래그 중인 대상이 적합한 드롭 대상 위에 있을 때 (수백 ms 마다 발생)
 document.addEventListener('dragover', (event: DroppableEvent) => {
@@ -42,17 +38,17 @@ document.addEventListener('drop', (event: DroppableEvent) => {
   event.preventDefault();
   event.stopPropagation();
 
-  if (!$dragenter) {
+  if (!dragentered.isBound()) {
     return;
   }
 
-  if (getGroupId() !== $dragenter[props].groupId) {
+  if (dragging.getProps().groupId !== dragentered.getProps().groupId) {
     return;
   }
 
-  $dragenter.dispatchEvent(
+  get(dragentered).dispatchEvent(
     new CustomEvent<DropEntityEvent['detail']>(dropEntityEventType, {
-      detail: { id: getProps($dragging).id },
+      detail: { id: dragging.getProps().id },
     })
   );
 });
@@ -65,20 +61,23 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.stopPropagation();
 
       const $currentTarget = event.currentTarget;
-      if (getGroupId() !== $currentTarget[props].groupId) {
+      if (
+        dragging.getProps().groupId !==
+        dragentered.utils.getNodeProps($currentTarget).groupId
+      ) {
         return;
       }
 
-      $dragenter = $currentTarget;
-      $dragenter[props]?.dragenter(event, $dragging);
+      dragentered.bind($currentTarget);
+      dragentered.getProps()?.dragenter(event, get(dragging));
     },
   ],
 ] as const);
 
-export type Parameter = DroppableHTMLElement[typeof props];
+export type Parameter = ReturnType<typeof dragentered['getProps']>;
 
-const set = (node: HTMLElement, { groupId, dragenter }: Parameter) => {
-  node[props] = { groupId, dragenter };
+const set = (node: HTMLElement, parameter: Parameter) => {
+  dragentered.utils.setNodeProps(node, parameter);
 };
 
 export function droppable(

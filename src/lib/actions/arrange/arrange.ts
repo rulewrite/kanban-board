@@ -1,9 +1,8 @@
 import type { Action } from 'svelte/action';
+import { get } from 'svelte/store';
 import {
-  $dragging,
   draggable,
-  DraggableHTMLElement,
-  getGroupId,
+  dragging,
   Parameter as DraggableParameter,
 } from '../draggable';
 import {
@@ -32,8 +31,7 @@ const dragend: DraggableParameter['dragend'] = (event) => {
 };
 
 const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
-  const $currentTarget = event.currentTarget as DroppableHTMLElement &
-    DraggableHTMLElement;
+  const $currentTarget = event.currentTarget;
   if ($dragging === $currentTarget) {
     return;
   }
@@ -51,12 +49,13 @@ const handleDropEntity = () => {
     return;
   }
 
+  const $dragging = get(dragging);
   $dragging.dispatchEvent(
     new CustomEvent<DropPositionEvent['detail']>('dropPosition', {
       detail: {
         siblingId: Number($sibling.dataset.id),
         position: orderedPosition.getBetween(
-          getGroupId(),
+          dragging.getProps().groupId,
           $dragging.previousElementSibling === $sibling,
           Number($sibling.dataset.position)
         ),

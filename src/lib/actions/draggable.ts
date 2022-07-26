@@ -1,20 +1,18 @@
 import type { ActionReturn } from 'svelte/action';
+import { createPropsElement } from '../store/propsElement';
 
-const props = Symbol('props');
+export const dragging = createPropsElement<{
+  id: number;
+  groupId: Symbol;
+  dragstart?: (e: DraggableEvent) => void;
+  dragend?: (e: DraggableEvent) => void;
+}>();
 
-type DraggableEvent = HTMLElementIncludeDragEvent<{
-  [props]: {
-    id: number;
-    groupId: Symbol;
-    dragstart?: (e: DraggableEvent) => void;
-    dragend?: (e: DraggableEvent) => void;
-  };
-}>;
-export type DraggableHTMLElement = DraggableEvent['currentTarget'];
+export type DraggableHTMLElement = ReturnType<
+  typeof dragging['utils']['setNodeProps']
+>;
 
-export let $dragging: DraggableHTMLElement = null;
-export const getProps = ($element: DraggableHTMLElement) => $element[props];
-export const getGroupId = () => getProps($dragging).groupId;
+type DraggableEvent = HTMLElementIncludeDragEvent<DraggableHTMLElement>;
 
 const mapEventTypeToListener = new Map<string, EventListener>([
   [
@@ -23,8 +21,8 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DraggableEvent) => {
       event.stopPropagation();
 
-      $dragging = event.currentTarget;
-      $dragging[props]?.dragstart(event);
+      dragging.bind(event.currentTarget);
+      dragging.getProps()?.dragstart(event);
     },
   ],
   [
@@ -33,19 +31,16 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DraggableEvent) => {
       event.stopPropagation();
 
-      $dragging = null;
-      event.currentTarget[props]?.dragend(event);
+      dragging.clear();
+      dragging.utils.getNodeProps(event.currentTarget)?.dragend(event);
     },
   ],
 ] as const);
 
-export type Parameter = DraggableHTMLElement[typeof props];
+export type Parameter = ReturnType<typeof dragging['getProps']>;
 
-const set = (
-  node: HTMLElement,
-  { id, groupId, dragstart, dragend }: Parameter
-) => {
-  node[props] = { id, groupId, dragstart, dragend };
+const set = (node: HTMLElement, parameter: Parameter) => {
+  dragging.utils.setNodeProps(node, parameter);
 };
 
 export function draggable(
