@@ -3,12 +3,13 @@ import { $dragging, getGroupId } from './draggable';
 
 export const dropEntityEventType = 'dropEntity';
 
-const groupIdKey = Symbol('groupId');
-const dragenterKey = Symbol('dragenter');
+const props = Symbol('props');
 
 type DroppableEvent = HTMLElementIncludeDragEvent<{
-  [groupIdKey]: Symbol;
-  [dragenterKey]?: (e: DroppableEvent, $dragging: HTMLElement) => void;
+  [props]: {
+    groupId: Symbol;
+    dragenter?: (e: DroppableEvent, $dragging: HTMLElement) => void;
+  };
 }>;
 
 let $dragenter: DroppableEvent['currentTarget'] = null;
@@ -39,7 +40,7 @@ document.addEventListener('drop', (event: DroppableEvent) => {
     return;
   }
 
-  if (getGroupId() !== $dragenter[groupIdKey]) {
+  if (getGroupId() !== $dragenter[props].groupId) {
     return;
   }
 
@@ -58,24 +59,20 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.stopPropagation();
 
       const $currentTarget = event.currentTarget;
-      if (getGroupId() !== $currentTarget[groupIdKey]) {
+      if (getGroupId() !== $currentTarget[props].groupId) {
         return;
       }
 
       $dragenter = $currentTarget;
-      $dragenter?.[dragenterKey](event, $dragging);
+      $dragenter[props]?.dragenter(event, $dragging);
     },
   ],
 ] as const);
 
-export interface Parameter {
-  groupId: DroppableEvent['currentTarget'][typeof groupIdKey];
-  dragenter?: DroppableEvent['currentTarget'][typeof dragenterKey];
-}
+export type Parameter = DroppableEvent['currentTarget'][typeof props];
 
 const set = (node: HTMLElement, { groupId, dragenter }: Parameter) => {
-  node[groupIdKey] = groupId;
-  dragenter ? (node[dragenterKey] = dragenter) : delete node[dragenterKey];
+  node[props] = { groupId, dragenter };
 };
 
 export function droppable(

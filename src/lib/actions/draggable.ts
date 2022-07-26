@@ -1,18 +1,18 @@
 import type { ActionReturn } from 'svelte/action';
 
-const groupIdKey = Symbol('groupId');
-const dragstartKey = Symbol('dragstart');
-const dragendKey = Symbol('dragend');
+const props = Symbol('props');
 
 type DraggableEvent = HTMLElementIncludeDragEvent<{
-  [groupIdKey]: Symbol;
-  [dragstartKey]?: (e: DraggableEvent) => void;
-  [dragendKey]?: (e: DraggableEvent) => void;
+  [props]: {
+    groupId: Symbol;
+    dragstart?: (e: DraggableEvent) => void;
+    dragend?: (e: DraggableEvent) => void;
+  };
 }>;
 
 export let $dragging: DraggableEvent['currentTarget'] = null;
 
-export const getGroupId = () => $dragging[groupIdKey];
+export const getGroupId = () => $dragging[props].groupId;
 
 const mapEventTypeToListener = new Map<string, EventListener>([
   [
@@ -22,7 +22,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.stopPropagation();
 
       $dragging = event.currentTarget;
-      $dragging?.[dragstartKey](event);
+      $dragging[props]?.dragstart(event);
     },
   ],
   [
@@ -32,21 +32,15 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       event.stopPropagation();
 
       $dragging = null;
-      event.currentTarget?.[dragendKey](event);
+      event.currentTarget[props]?.dragend(event);
     },
   ],
 ] as const);
 
-export interface Parameter {
-  groupId: DraggableEvent['currentTarget'][typeof groupIdKey];
-  dragstart?: DraggableEvent['currentTarget'][typeof dragstartKey];
-  dragend?: DraggableEvent['currentTarget'][typeof dragendKey];
-}
+export type Parameter = DraggableEvent['currentTarget'][typeof props];
 
 const set = (node: HTMLElement, { groupId, dragstart, dragend }: Parameter) => {
-  node[groupIdKey] = groupId;
-  dragstart ? (node[dragstartKey] = dragstart) : delete node[dragstartKey];
-  dragend ? (node[dragendKey] = dragend) : delete node[dragendKey];
+  node[props] = { groupId, dragstart, dragend };
 };
 
 export function draggable(
