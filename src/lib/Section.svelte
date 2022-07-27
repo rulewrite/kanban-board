@@ -176,11 +176,19 @@
         }
 
         dispatch('createdId', id);
+
         const card = cardEntities[cardId];
         sections.updateEntity(card.postId, ({ comments, ...seciton }) => {
           return {
             ...seciton,
             comments: comments.filter((id) => id !== cardId),
+          };
+        });
+
+        cards.updateEntity(cardId, (card) => {
+          return {
+            ...card,
+            postId: id,
           };
         });
 
