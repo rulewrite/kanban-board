@@ -213,7 +213,7 @@
         sections.updateEntity(sectionId, ({ comments, ...seciton }) => {
           return {
             ...seciton,
-            comments: [cardId],
+            comments: uniq([...(comments ?? []), cardId]),
           };
         });
       });
