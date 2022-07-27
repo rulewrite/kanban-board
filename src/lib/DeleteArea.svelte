@@ -4,7 +4,7 @@
   import type { Unsubscriber } from 'svelte/store';
   import { slide } from 'svelte/transition';
   import { dragging } from './actions/draggable';
-  import { droppable, Parameter } from './actions/droppable';
+  import { dragentered, droppable, Parameter } from './actions/droppable';
   import { cardApi, sectionApi } from './api/jsonPlaceholder';
   import { groupId as cardGroupId } from './Card.svelte';
   import { groupId as sectionGroupId } from './Section.svelte';
@@ -23,6 +23,7 @@
   const dragleave: Parameter['dragleave'] = (e, $dragging) => {
     $dragging.hidden = false;
 
+    dragentered.clear();
     active = false;
   };
 
