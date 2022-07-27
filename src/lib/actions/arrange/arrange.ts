@@ -1,5 +1,9 @@
 import type { Action } from 'svelte/action';
-import { draggable, Parameter as DraggableParameter } from '../draggable';
+import {
+  draggable,
+  DraggableHTMLElement,
+  Parameter as DraggableParameter,
+} from '../draggable';
 import {
   droppable,
   DroppableHTMLElement,
@@ -15,6 +19,25 @@ const orderedPosition = new OrderedPosition();
 
 export const removePosition = (groupId: Symbol, position: number) => {
   orderedPosition.remove(groupId, position);
+};
+
+export const getBetweenPostion = (
+  groupId: Symbol,
+  $dragging: DraggableHTMLElement
+) => {
+  const prevElement = $dragging.previousElementSibling as HTMLElement;
+  const prevPosition = Number(prevElement.dataset?.position);
+  if (prevElement && prevPosition) {
+    return orderedPosition.getBetween(groupId, true, prevPosition);
+  }
+
+  const nextElement = $dragging.nextElementSibling as HTMLElement;
+  const nextPosition = Number(nextElement.dataset?.position);
+  if (nextElement && nextPosition) {
+    return orderedPosition.getBetween(groupId, false, nextPosition);
+  }
+
+  return null;
 };
 
 let $sibling: DroppableHTMLElement = null;

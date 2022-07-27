@@ -3,6 +3,7 @@
   import { uniq } from 'lodash-es';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
+  import { getBetweenPostion } from './actions/arrange/arrange';
   import { droppable, Parameter } from './actions/droppable';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import Card, { groupId } from './Card.svelte';
@@ -31,12 +32,16 @@
 
   const moveCard: Parameter['drop'] = (e, dragging) => {
     const cardId = dragging.getProps().id;
-    const prevSectionId = cardEntities[cardId].postId;
+    const card = cardEntities[cardId];
+    const prevSectionId = card.postId;
+
+    const position =
+      getBetweenPostion(groupId, dragging.getElement()) ?? card.position;
 
     updateUnsubscribe = cardApi
       .update({
         id: cardId,
-        body: { postId: sectionId },
+        body: { postId: sectionId, position },
       })
       .subscribe(({ isFetching, failMessage }) => {
         if (isFetching) {
@@ -68,21 +73,21 @@
   });
 </script>
 
-{#if cardIds.length}
-  <Content>
+<Content>
+  {#if cardIds.length}
     <div class="mdc-typography--caption">{cardIds}</div>
 
     {#each cardIds as cardId (cardId)}
       <Card id={cardId} {sectionId} />
     {/each}
-  </Content>
-{/if}
-<div
-  use:droppable={{
-    groupIds: [groupId],
-    dragenter,
-    drop: moveCard,
-  }}
->
-  <Card {sectionId} />
-</div>
+  {/if}
+  <div
+    use:droppable={{
+      groupIds: [groupId],
+      dragenter,
+      drop: moveCard,
+    }}
+  >
+    <Card {sectionId} />
+  </div>
+</Content>
