@@ -1,10 +1,6 @@
 import type { Action } from 'svelte/action';
 import { get } from 'svelte/store';
-import {
-  draggable,
-  DraggableHTMLElement,
-  Parameter as DraggableParameter,
-} from '../draggable';
+import { draggable, Parameter as DraggableParameter } from '../draggable';
 import {
   droppable,
   DroppableHTMLElement,
@@ -30,13 +26,7 @@ const dragend: DraggableParameter['dragend'] = (event) => {
 };
 
 const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
-  const $currentTarget = event.currentTarget as DroppableHTMLElement &
-    DraggableHTMLElement;
-  if ($dragging === $currentTarget) {
-    return;
-  }
-
-  $sibling = $currentTarget;
+  $sibling = event.currentTarget;
   const isNext = $sibling.nextElementSibling === $dragging;
   $sibling.parentNode.insertBefore(
     $dragging,

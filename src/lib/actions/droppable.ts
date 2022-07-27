@@ -56,7 +56,14 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DroppableEvent) => {
       event.stopPropagation();
 
-      const $currentTarget = event.currentTarget;
+      const $dragging = get(dragging);
+      const $currentTarget = event.currentTarget as DroppableHTMLElement &
+        DraggableHTMLElement;
+
+      if ($dragging === $currentTarget) {
+        return;
+      }
+
       if (
         !dragentered.utils
           .getNodeProps($currentTarget)
@@ -66,7 +73,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       }
 
       dragentered.bind($currentTarget);
-      dragentered.getProps()?.dragenter(event, get(dragging));
+      dragentered.getProps()?.dragenter(event, $dragging);
     },
   ],
   [
