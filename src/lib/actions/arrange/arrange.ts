@@ -1,5 +1,4 @@
 import type { Action } from 'svelte/action';
-import { get } from 'svelte/store';
 import { draggable, Parameter as DraggableParameter } from '../draggable';
 import {
   droppable,
@@ -39,7 +38,7 @@ const drop: DroppableParameter['drop'] = (e, dragging) => {
     return;
   }
 
-  const $dragging = get(dragging);
+  const $dragging = dragging.getElement();
   $dragging.dispatchEvent(
     new CustomEvent<DropPositionEvent['detail']>('dropPosition', {
       detail: {

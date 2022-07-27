@@ -1,5 +1,4 @@
 import type { ActionReturn } from 'svelte/action';
-import { get } from 'svelte/store';
 import { createPropsElement } from '../store/propsElement';
 import { DraggableHTMLElement, dragging } from './draggable';
 
@@ -56,7 +55,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DroppableEvent) => {
       event.stopPropagation();
 
-      const $dragging = get(dragging);
+      const $dragging = dragging.getElement();
       const $currentTarget = event.currentTarget as DroppableHTMLElement &
         DraggableHTMLElement;
 
@@ -105,7 +104,7 @@ const mapEventTypeToListener = new Map<string, EventListener>([
         event.clientY <= rect.top ||
         event.clientY >= rect.bottom
       ) {
-        dragleave(event, get(dragging));
+        dragleave(event, dragging.getElement());
       }
     },
   ],

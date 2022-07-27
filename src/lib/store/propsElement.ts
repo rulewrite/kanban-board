@@ -8,6 +8,8 @@ export function createPropsElement<T extends { [key: string]: any }>() {
 
   const { subscribe, set } = writable<PropsElement>(null);
 
+  const getElement = () => get({ subscribe });
+
   return {
     utils: {
       setNodeProps: (node: HTMLElement, props: T) => {
@@ -17,8 +19,9 @@ export function createPropsElement<T extends { [key: string]: any }>() {
       getNodeProps: (node: PropsElement) => node[propsKey],
     },
 
-    isBound: () => get({ subscribe }) !== null,
-    getProps: () => get({ subscribe })[propsKey],
+    getElement,
+    getProps: () => getElement()[propsKey],
+    isBound: () => getElement() !== null,
 
     subscribe,
     bind: (element: PropsElement) => set(element),
