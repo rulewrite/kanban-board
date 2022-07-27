@@ -11,10 +11,11 @@
   import { clickOutside } from './actions/clickOutside';
   import { droppable, Parameter } from './actions/droppable';
   import { Section, sectionApi } from './api/jsonPlaceholder';
-  import Card, { groupId as cardGroupId } from './Card.svelte';
+  import { groupId as cardGroupId } from './Card.svelte';
+  import Cards from './Cards.svelte';
   import IdBadge from './IdBadge.svelte';
   import { createEditId } from './store/editId';
-  import { isDeleted, mapKeyToEntities } from './store/entities';
+  import { mapKeyToEntities } from './store/entities';
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
@@ -39,12 +40,6 @@
 
   $: section = $sections[id];
   $: isEdit = $editSectionId === editId;
-  $: cardEntities = $cards;
-  $: cardIds = (section?.comments ?? [])
-    .map((id) => cardEntities[id])
-    .filter((cartd) => !cartd?.[isDeleted])
-    .sort((a, b) => a.position - b.position)
-    .map(({ id }) => id);
 
   let createUnsubscribe: Unsubscriber;
   let updateUnsubscribe: Unsubscriber;
@@ -192,7 +187,7 @@
 
         dispatch('createdId', id);
 
-        const card = cardEntities[cardId];
+        const card = $cards[cardId];
         sections.updateEntity(card.postId, ({ comments, ...seciton }) => {
           return {
             ...seciton,
@@ -299,16 +294,7 @@
     {/if}
 
     {#if section}
-      {#if cardIds.length}
-        <Content>
-          <div class="mdc-typography--caption">{cardIds}</div>
-
-          {#each cardIds as cardId (cardId)}
-            <Card id={cardId} sectionId={section.id} />
-          {/each}
-        </Content>
-      {/if}
-      <Card sectionId={section.id} />
+      <Cards ids={section?.comments ?? []} sectionId={section.id} />
     {/if}
   </Paper>
 </div>
