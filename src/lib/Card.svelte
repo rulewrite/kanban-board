@@ -28,13 +28,13 @@
 <script lang="ts">
   export let id: CardType['id'] = null;
   export let sectionId: Section['id'] = NaN;
+  const editId = String(id ?? uniqueId('create_card_'));
 
   let bodyInput: TextfieldComponentDev;
   let body = '';
   let isHover = false;
 
   $: card = $cards[id];
-  $: editId = String(id ?? uniqueId('create_card_'));
   $: isEdit = $editCardId === editId;
 
   let createUnsubscribe: Unsubscriber;

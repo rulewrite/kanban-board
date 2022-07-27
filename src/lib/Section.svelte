@@ -31,13 +31,13 @@
   const dispatch = createEventDispatcher<{ createdId: number }>();
 
   export let id: Section['id'] = null;
+  const editId = String(id ?? uniqueId('create_section_'));
 
   let titleInput: TextfieldComponentDev;
   let title = '';
   let body = '';
 
   $: section = $sections[id];
-  $: editId = String(id ?? uniqueId('create_section_'));
   $: isEdit = $editSectionId === editId;
   $: cardEntities = $cards;
   $: cardIds = (section?.comments ?? [])
