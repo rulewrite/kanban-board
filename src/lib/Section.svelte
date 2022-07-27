@@ -68,6 +68,21 @@
     editSectionId.toggle(editId);
   }
 
+  function handleKeydown(e: CustomEvent) {
+    const event = e as unknown as KeyboardEvent;
+
+    if (event.key === 'Esc' || event.key === 'Escape') {
+      toggleEdit();
+      return;
+    }
+
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    section ? update() : create();
+  }
+
   function validate() {
     const trimedTitle = title.trim();
 
@@ -239,13 +254,19 @@
           bind:value={title}
           required
           label="Title"
+          on:keydown={handleKeydown}
         >
           <HelperText validationMsg slot="helper">
             타이틀을 올바르게 입력해주세요.
           </HelperText>
         </Textfield>
 
-        <Textfield textarea bind:value={body} label="Description">
+        <Textfield
+          textarea
+          bind:value={body}
+          label="Description"
+          on:keydown={handleKeydown}
+        >
           <HelperText slot="helper">섹션 설명</HelperText>
         </Textfield>
       </Content>

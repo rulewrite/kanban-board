@@ -58,6 +58,21 @@
     editCardId.toggle(editId);
   }
 
+  function handleKeydown(e: CustomEvent) {
+    const event = e as unknown as KeyboardEvent;
+
+    if (event.key === 'Esc' || event.key === 'Escape') {
+      toggleEdit();
+      return;
+    }
+
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    card ? update() : create();
+  }
+
   function validate() {
     const trimedBody = body.trim();
 
@@ -244,6 +259,7 @@
           bind:value={body}
           required
           label="Body"
+          on:keydown={handleKeydown}
         >
           <HelperText validationMsg slot="helper">
             내용을 올바르게 입력해주세요.
