@@ -7,7 +7,7 @@
   import { uniq, uniqueId } from 'lodash-es';
   import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { arrange } from './actions/arrange/arrange';
+  import { arrange, removePosition } from './actions/arrange/arrange';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
   import { createEditId } from './store/editId';
@@ -140,6 +140,7 @@
           return;
         }
 
+        removePosition(groupId, card.position);
         editCardId.off(editId);
       });
   }
@@ -171,8 +172,6 @@
         sections.updateEntity(sectionId, ({ comments, ...section }) => {
           return { ...section, comments: comments.filter((i) => i !== id) };
         });
-
-        await tick();
 
         sections.updateEntity(movedSectionId, ({ comments, ...section }) => {
           return { ...section, comments: uniq([...comments, id]) };

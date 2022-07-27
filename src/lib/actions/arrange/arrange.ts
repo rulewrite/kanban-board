@@ -13,6 +13,10 @@ import {
 
 const orderedPosition = new OrderedPosition();
 
+export const removePosition = (groupId: Symbol, position: number) => {
+  orderedPosition.remove(groupId, position);
+};
+
 let $sibling: DroppableHTMLElement = null;
 
 const dragstart: DraggableParameter['dragstart'] = (event) => {
@@ -109,8 +113,6 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
       });
     },
     destroy() {
-      orderedPosition.remove(groupId, Number(node.dataset.position));
-
       destoryDraggable();
 
       destroyDroppable();

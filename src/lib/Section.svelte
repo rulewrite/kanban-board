@@ -7,7 +7,7 @@
   import { uniqueId } from 'lodash-es';
   import { createEventDispatcher, onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { arrange } from './actions/arrange/arrange';
+  import { arrange, removePosition } from './actions/arrange/arrange';
   import { clickOutside } from './actions/clickOutside';
   import { droppable, Parameter } from './actions/droppable';
   import { Section, sectionApi } from './api/jsonPlaceholder';
@@ -148,6 +148,7 @@
           return;
         }
 
+        removePosition(groupId, section.position);
         editSectionId.off(editId);
       });
   }
