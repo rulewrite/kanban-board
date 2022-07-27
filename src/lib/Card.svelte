@@ -8,6 +8,7 @@
   import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import { arrange } from './actions/arrange/arrange';
+  import { droppable, Parameter } from './actions/droppable';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
   import { createEditId } from './store/editId';
@@ -18,6 +19,10 @@
 
   export const groupId = Symbol('cardsArrange');
   const editCardId = createEditId();
+
+  const dragenter: Parameter['dragenter'] = (event, $dragging) => {
+    event.currentTarget.parentNode.insertBefore($dragging, event.currentTarget);
+  };
 </script>
 
 <script lang="ts">
@@ -165,6 +170,40 @@
       });
   }
 
+  const moveCard: Parameter['drop'] = (e, dragging) => {
+    const cardId = dragging.getProps().id;
+    const prevSectionId = $cards[cardId].postId;
+
+    updateUnsubscribe = cardApi
+      .update({
+        id: cardId,
+        body: { postId: sectionId },
+      })
+      .subscribe(({ isFetching, failMessage }) => {
+        if (isFetching) {
+          return;
+        }
+
+        if (failMessage) {
+          return;
+        }
+
+        sections.updateEntity(prevSectionId, ({ comments, ...seciton }) => {
+          return {
+            ...seciton,
+            comments: comments.filter((id) => id !== cardId),
+          };
+        });
+
+        sections.updateEntity(sectionId, ({ comments, ...seciton }) => {
+          return {
+            ...seciton,
+            comments: [cardId],
+          };
+        });
+      });
+  };
+
   onDestroy(() => {
     createUnsubscribe && createUnsubscribe();
     updateUnsubscribe && updateUnsubscribe();
@@ -183,6 +222,13 @@
       }
     : null}
   on:dropPosition={dropPosition}
+  use:droppable={card
+    ? null
+    : {
+        groupIds: [groupId],
+        dragenter,
+        drop: moveCard,
+      }}
 >
   <Card
     variant="outlined"
