@@ -3,7 +3,7 @@
   import { uniq } from 'lodash-es';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { getBetweenPostion } from './actions/arrange/arrange';
+  import { getUpdatePostion } from './actions/arrange/arrange';
   import { droppable, Parameter } from './actions/droppable';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import Card, { groupId } from './Card.svelte';
@@ -35,8 +35,7 @@
     const card = cardEntities[cardId];
     const prevSectionId = card.postId;
 
-    const position =
-      getBetweenPostion(groupId, dragging.getElement()) ?? card.position;
+    const { position = card.position } = getUpdatePostion(dragging) ?? {};
 
     updateUnsubscribe = cardApi
       .update({

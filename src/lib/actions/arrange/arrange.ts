@@ -1,14 +1,10 @@
 import type { Action } from 'svelte/action';
 import {
   draggable,
-  DraggableHTMLElement,
+  dragging,
   Parameter as DraggableParameter,
 } from '../draggable';
-import {
-  droppable,
-  DroppableHTMLElement,
-  Parameter as DroppableParameter,
-} from '../droppable';
+import { droppable, Parameter as DroppableParameter } from '../droppable';
 import OrderedPosition from './OrderedPosition';
 import {
   draggable as draggableClassName,
@@ -21,26 +17,30 @@ export const removePosition = (groupId: Symbol, position: number) => {
   orderedPosition.remove(groupId, position);
 };
 
-export const getBetweenPostion = (
-  groupId: Symbol,
-  $dragging: DraggableHTMLElement
-) => {
+export const getUpdatePostion = (d: typeof dragging) => {
+  const groupId = d.getProps().groupId;
+  const $dragging = d.getElement();
+
   const prevElement = $dragging.previousElementSibling as HTMLElement;
   const prevPosition = Number(prevElement.dataset?.position);
   if (prevElement && prevPosition) {
-    return orderedPosition.getBetween(groupId, true, prevPosition);
+    return {
+      $sibling: prevElement,
+      position: orderedPosition.getBetween(groupId, true, prevPosition),
+    };
   }
 
   const nextElement = $dragging.nextElementSibling as HTMLElement;
   const nextPosition = Number(nextElement.dataset?.position);
   if (nextElement && nextPosition) {
-    return orderedPosition.getBetween(groupId, false, nextPosition);
+    return {
+      $sibling: nextElement,
+      position: orderedPosition.getBetween(groupId, false, nextPosition),
+    };
   }
 
   return null;
 };
-
-let $sibling: DroppableHTMLElement = null;
 
 const dragstart: DraggableParameter['dragstart'] = (event) => {
   event.currentTarget.classList.add(draggingClassName);
@@ -48,11 +48,10 @@ const dragstart: DraggableParameter['dragstart'] = (event) => {
 
 const dragend: DraggableParameter['dragend'] = (event) => {
   event.currentTarget.classList.remove(draggingClassName);
-  $sibling = null;
 };
 
 const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
-  $sibling = event.currentTarget;
+  const $sibling = event.currentTarget;
   const isNext = $sibling.nextElementSibling === $dragging;
   $sibling.parentNode.insertBefore(
     $dragging,
@@ -61,20 +60,19 @@ const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
 };
 
 const drop: DroppableParameter['drop'] = (e, dragging) => {
-  if (!$sibling) {
+  const updatePostion = getUpdatePostion(dragging);
+  if (!updatePostion) {
     return;
   }
+
+  const { $sibling, position } = updatePostion;
 
   const $dragging = dragging.getElement();
   $dragging.dispatchEvent(
     new CustomEvent<DropPositionEvent['detail']>('dropPosition', {
       detail: {
         siblingId: Number($sibling.dataset.id),
-        position: orderedPosition.getBetween(
-          dragging.getProps().groupId,
-          $dragging.previousElementSibling === $sibling,
-          Number($sibling.dataset.position)
-        ),
+        position,
       },
     })
   );
