@@ -48,18 +48,18 @@ class OrderedPosition {
     this.add(groupId, replacePosition);
   }
 
-  getBetween(groupId: Id, isNext: boolean, position: Position) {
+  getBetween(groupId: Id, isWithNext: boolean, position: Position) {
     const positions = this.getWithInitial(groupId);
 
     const index = positions.findIndex((p) => p === position);
 
-    const isLast = positions.length - 1 === index;
-    if (isLast) {
+    const lastIndex = positions.length - 1;
+    if (lastIndex === index) {
       return position + arrangeUnit;
     }
 
-    const prevPosition = positions[index + (isNext ? 1 : -1)] ?? 0;
-    return (prevPosition + position) / 2;
+    const siblingPosition = positions[index + (isWithNext ? 1 : -1)] ?? 0;
+    return (siblingPosition + position) / 2;
   }
 }
 
