@@ -17,12 +17,11 @@
   import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
-  import { createPositions } from './store/positions';
 
   const sections = mapKeyToEntities.sections;
+  const sectionPositions = mapKeyToEntities.sections.positions;
   const cards = mapKeyToEntities.cards;
 
-  const positions = createPositions();
   export const groupId = Symbol('sectionsArrange');
   const editSectionId = createEditId();
   const exceptClickOutsideDataset = 'data-except-click-outside';
@@ -151,7 +150,6 @@
           return;
         }
 
-        positions.remove(section.position);
         editSectionId.off(editId);
       });
   }
@@ -227,7 +225,7 @@
         groupId,
         id: section.id,
         position: section.position,
-        positions,
+        positions: sectionPositions,
       }
     : null}
   on:dropPosition={dropPosition}

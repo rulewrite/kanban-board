@@ -13,12 +13,11 @@
   import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
-  import { createPositions } from './store/positions';
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
+  const cardPositions = mapKeyToEntities.cards.positions;
 
-  const positions = createPositions();
   export const groupId = Symbol('cardsArrange');
   const editCardId = createEditId();
 </script>
@@ -143,7 +142,6 @@
           return;
         }
 
-        positions.remove(card.position);
         editCardId.off(editId);
       });
   }
@@ -197,7 +195,7 @@
         groupId,
         id: card.id,
         position: card.position,
-        positions,
+        positions: cardPositions,
       }
     : null}
   on:dropPosition={dropPosition}

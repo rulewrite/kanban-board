@@ -12,13 +12,12 @@ import {
   dragging as draggingClassName,
 } from './style';
 
-export interface Arrangeable {
+const { utils } = createPropsElement<{
+  groupId: Symbol;
   id: number;
   position: number;
   positions: Positions;
-}
-
-const { utils } = createPropsElement<Arrangeable>();
+}>();
 
 type ArrangealbeHTMLElement = ReturnType<typeof utils['setNodeProps']>;
 
@@ -85,9 +84,7 @@ const drop: DroppableParameter['drop'] = (e, dragging) => {
   );
 };
 
-interface Parameter extends Arrangeable {
-  groupId: Symbol;
-}
+type Parameter = ReturnType<typeof utils['getNodeProps']>;
 
 const set = (node: HTMLElement, parameter: Parameter) => {
   utils.setNodeProps(node, parameter);
@@ -103,9 +100,8 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
 
   node.classList.add(draggableClassName);
 
-  const { id, groupId, position, positions } = parameter;
+  const { id, groupId } = parameter;
   set(node, parameter);
-  positions.add(position);
 
   const { update: updateDraggable, destroy: destoryDraggable } = draggable(
     node,
@@ -120,7 +116,6 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
   return {
     update(updatedParameter: Parameter) {
       set(node, updatedParameter);
-      positions.replace(position, updatedParameter.position);
 
       updateDraggable({
         id: updatedParameter.id,
