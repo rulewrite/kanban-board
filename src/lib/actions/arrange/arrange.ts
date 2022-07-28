@@ -1,4 +1,5 @@
 import type { Action } from 'svelte/action';
+import { createPropsElement } from '../../store/propsElement';
 import {
   draggable,
   dragging,
@@ -13,6 +14,15 @@ import {
 
 const orderedPosition = new OrderedPosition();
 
+export interface Arrangeable {
+  id: number;
+  position: number;
+}
+
+const { utils } = createPropsElement<Arrangeable>();
+
+type ArrangealbeHTMLElement = ReturnType<typeof utils['setNodeProps']>;
+
 export const removePosition = (groupId: Symbol, position: number) => {
   orderedPosition.remove(groupId, position);
 };
@@ -21,8 +31,9 @@ export const getUpdatePostion = (d: typeof dragging) => {
   const groupId = d.getProps().groupId;
   const $dragging = d.getElement();
 
-  const prevElement = $dragging.previousElementSibling as HTMLElement;
-  const prevPosition = Number(prevElement.dataset?.position);
+  const prevElement =
+    $dragging.previousElementSibling as ArrangealbeHTMLElement;
+  const prevPosition = utils.getNodeProps(prevElement)?.position;
   if (prevElement && prevPosition) {
     return {
       $sibling: prevElement,
@@ -30,8 +41,8 @@ export const getUpdatePostion = (d: typeof dragging) => {
     };
   }
 
-  const nextElement = $dragging.nextElementSibling as HTMLElement;
-  const nextPosition = Number(nextElement.dataset?.position);
+  const nextElement = $dragging.nextElementSibling as ArrangealbeHTMLElement;
+  const nextPosition = utils.getNodeProps(nextElement)?.position;
   if (nextElement && nextPosition) {
     return {
       $sibling: nextElement,
@@ -71,25 +82,19 @@ const drop: DroppableParameter['drop'] = (e, dragging) => {
   $dragging.dispatchEvent(
     new CustomEvent<DropPositionEvent['detail']>('dropPosition', {
       detail: {
-        siblingId: Number($sibling.dataset.id),
+        siblingId: utils.getNodeProps($sibling).id,
         position,
       },
     })
   );
 };
 
-export interface Arrangeable {
-  id: number;
-  position: number;
-}
-
 interface Parameter extends Arrangeable {
   groupId: Symbol;
 }
 
-const set = (node: HTMLElement, { id, position }: Parameter) => {
-  node.dataset.id = String(id);
-  node.dataset.position = String(position);
+const set = (node: HTMLElement, parameter: Parameter) => {
+  utils.setNodeProps(node, parameter);
 };
 
 export const arrange: Action<HTMLElement, Parameter | null> = (
