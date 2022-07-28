@@ -7,16 +7,18 @@
   import { uniq, uniqueId } from 'lodash-es';
   import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { arrange, removePosition } from './actions/arrange/arrange';
+  import { arrange } from './actions/arrange/arrange';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
   import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
+  import { createPositions } from './store/positions';
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
 
+  const positions = createPositions();
   export const groupId = Symbol('cardsArrange');
   const editCardId = createEditId();
 </script>
@@ -141,7 +143,7 @@
           return;
         }
 
-        removePosition(groupId, card.position);
+        positions.remove(card.position);
         editCardId.off(editId);
       });
   }
@@ -195,6 +197,7 @@
         groupId,
         id: card.id,
         position: card.position,
+        positions,
       }
     : null}
   on:dropPosition={dropPosition}

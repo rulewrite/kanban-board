@@ -7,7 +7,7 @@
   import { uniqueId } from 'lodash-es';
   import { createEventDispatcher, onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { arrange, removePosition } from './actions/arrange/arrange';
+  import { arrange } from './actions/arrange/arrange';
   import { clickOutside } from './actions/clickOutside';
   import { droppable, Parameter } from './actions/droppable';
   import { Section, sectionApi } from './api/jsonPlaceholder';
@@ -17,10 +17,12 @@
   import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
+  import { createPositions } from './store/positions';
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
 
+  const positions = createPositions();
   export const groupId = Symbol('sectionsArrange');
   const editSectionId = createEditId();
   const exceptClickOutsideDataset = 'data-except-click-outside';
@@ -149,7 +151,7 @@
           return;
         }
 
-        removePosition(groupId, section.position);
+        positions.remove(section.position);
         editSectionId.off(editId);
       });
   }
@@ -225,6 +227,7 @@
         groupId,
         id: section.id,
         position: section.position,
+        positions,
       }
     : null}
   on:dropPosition={dropPosition}

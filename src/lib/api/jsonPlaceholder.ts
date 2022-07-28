@@ -1,7 +1,7 @@
 import { schema } from 'normalizr';
 import { Arrangeable } from '../actions/arrange/arrange';
-import { arrangeUnit } from '../actions/arrange/OrderedPosition';
 import { CARDS_SCHEMA_KEY, SECTIONS_SCHEMA_KEY } from '../store/entities';
+import { arrangeUnit } from '../store/positions';
 import StatusApi from './StatusApi';
 
 interface Params {

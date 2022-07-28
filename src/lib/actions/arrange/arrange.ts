@@ -1,3 +1,4 @@
+import type { Positions } from 'src/lib/store/positions';
 import type { Action } from 'svelte/action';
 import { createPropsElement } from '../../store/propsElement';
 import {
@@ -6,47 +7,42 @@ import {
   Parameter as DraggableParameter,
 } from '../draggable';
 import { droppable, Parameter as DroppableParameter } from '../droppable';
-import OrderedPosition from './OrderedPosition';
 import {
   draggable as draggableClassName,
   dragging as draggingClassName,
 } from './style';
 
-const orderedPosition = new OrderedPosition();
-
 export interface Arrangeable {
   id: number;
   position: number;
+  positions: Positions;
 }
 
 const { utils } = createPropsElement<Arrangeable>();
 
 type ArrangealbeHTMLElement = ReturnType<typeof utils['setNodeProps']>;
 
-export const removePosition = (groupId: Symbol, position: number) => {
-  orderedPosition.remove(groupId, position);
-};
-
 export const getUpdatePostion = (d: typeof dragging) => {
-  const groupId = d.getProps().groupId;
   const $dragging = d.getElement();
 
   const prevElement =
     $dragging.previousElementSibling as ArrangealbeHTMLElement;
-  const prevPosition = utils.getNodeProps(prevElement)?.position;
-  if (prevElement && prevPosition) {
+  const prevPorps = utils.getNodeProps(prevElement);
+  if (prevElement && prevPorps) {
+    const { positions, position } = prevPorps;
     return {
       $sibling: prevElement,
-      position: orderedPosition.getBetween(groupId, true, prevPosition),
+      position: positions.getBetween(true, position),
     };
   }
 
   const nextElement = $dragging.nextElementSibling as ArrangealbeHTMLElement;
-  const nextPosition = utils.getNodeProps(nextElement)?.position;
-  if (nextElement && nextPosition) {
+  const nextProps = utils.getNodeProps(nextElement);
+  if (nextElement && nextProps) {
+    const { positions, position } = nextProps;
     return {
       $sibling: nextElement,
-      position: orderedPosition.getBetween(groupId, false, nextPosition),
+      position: positions.getBetween(false, position),
     };
   }
 
@@ -107,9 +103,9 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
 
   node.classList.add(draggableClassName);
 
-  const { id, groupId, position } = parameter;
+  const { id, groupId, position, positions } = parameter;
   set(node, parameter);
-  orderedPosition.add(groupId, position);
+  positions.add(position);
 
   const { update: updateDraggable, destroy: destoryDraggable } = draggable(
     node,
@@ -124,7 +120,7 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
   return {
     update(updatedParameter: Parameter) {
       set(node, updatedParameter);
-      orderedPosition.replace(groupId, position, updatedParameter.position);
+      positions.replace(position, updatedParameter.position);
 
       updateDraggable({
         id: updatedParameter.id,
