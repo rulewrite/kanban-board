@@ -17,6 +17,7 @@
   import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
+  import { unsubscribeErrorHandler } from './utils';
 
   const sections = mapKeyToEntities.sections;
   const sectionPositions = mapKeyToEntities.sections.positions;
@@ -43,9 +44,6 @@
   $: section = $sections[id];
   $: isEdit = $editSectionId === editId;
 
-  let createUnsubscribe: Unsubscriber;
-  let updateUnsubscribe: Unsubscriber;
-  let deleteUnsubscribe: Unsubscriber;
   const unsubscribers: Array<Unsubscriber> = [
     editSectionId.subscribe(async (id) => {
       if (id !== editId) {
@@ -100,7 +98,7 @@
       return;
     }
 
-    createUnsubscribe = sectionApi
+    const unsubscriber = sectionApi
       .create({ body })
       .subscribe(({ isFetching, failMessage, id }) => {
         if (isFetching) {
@@ -114,7 +112,9 @@
         dispatch('createdId', id);
 
         editSectionId.off(editId);
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   }
 
   function update() {
@@ -123,7 +123,7 @@
       return;
     }
 
-    updateUnsubscribe = sectionApi
+    const unsubscriber = sectionApi
       .update({ id, body })
       .subscribe(({ isFetching, failMessage }) => {
         if (isFetching) {
@@ -135,11 +135,13 @@
         }
 
         editSectionId.off(editId);
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   }
 
   function deleteSection() {
-    deleteUnsubscribe = sectionApi
+    const unsubscriber = sectionApi
       .delete({ id })
       .subscribe(({ isFetching, failMessage }) => {
         if (isFetching) {
@@ -151,11 +153,13 @@
         }
 
         editSectionId.off(editId);
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   }
 
   function dropPosition(event: DropPositionEvent) {
-    updateUnsubscribe = sectionApi
+    const unsubscriber = sectionApi
       .update({
         id,
         body: {
@@ -170,13 +174,16 @@
         if (failMessage) {
           return;
         }
+
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   }
 
   const createSectionWithCard: Parameter['drop'] = (e, dragging) => {
     const cardId = dragging.getProps().id;
 
-    createUnsubscribe = sectionApi
+    const unsubscriber = sectionApi
       .create({ body: { title: 'title', comments: [cardId] } })
       .subscribe(async ({ isFetching, failMessage, id }) => {
         if (isFetching) {
@@ -207,14 +214,17 @@
         await tick();
 
         editSectionId.toggle(String(id));
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   };
 
   onDestroy(() => {
-    createUnsubscribe && createUnsubscribe();
-    updateUnsubscribe && updateUnsubscribe();
-    deleteUnsubscribe && deleteUnsubscribe();
-    unsubscribers.forEach((unsubscriber) => unsubscriber());
+    try {
+      unsubscribers.forEach((unsubscriber) => unsubscriber());
+    } catch (error) {
+      unsubscribeErrorHandler(error);
+    }
   });
 </script>
 

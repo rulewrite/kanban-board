@@ -13,6 +13,7 @@
   import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
+  import { unsubscribeErrorHandler } from './utils';
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
@@ -34,9 +35,6 @@
   $: card = $cards[id];
   $: isEdit = $editCardId === editId;
 
-  let createUnsubscribe: Unsubscriber;
-  let updateUnsubscribe: Unsubscriber;
-  let deleteUnsubscribe: Unsubscriber;
   const unsubscribers: Array<Unsubscriber> = [
     editCardId.subscribe(async (id) => {
       if (id !== editId) {
@@ -89,7 +87,7 @@
       return;
     }
 
-    createUnsubscribe = cardApi
+    const unsubscriber = cardApi
       .create({
         body: { ...body, postId: sectionId },
       })
@@ -106,7 +104,9 @@
           return { ...section, comments: uniq([...comments, id]) };
         });
         editCardId.off(editId);
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   }
 
   function update() {
@@ -115,7 +115,7 @@
       return;
     }
 
-    updateUnsubscribe = cardApi
+    const unsubscriber = cardApi
       .update({ id, body })
       .subscribe(({ isFetching, failMessage }) => {
         if (isFetching) {
@@ -127,11 +127,13 @@
         }
 
         editCardId.off(editId);
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   }
 
   function deleteCard() {
-    deleteUnsubscribe = cardApi
+    const unsubscriber = cardApi
       .delete({ id })
       .subscribe(({ isFetching, failMessage }) => {
         if (isFetching) {
@@ -143,13 +145,15 @@
         }
 
         editCardId.off(editId);
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   }
 
   function dropPosition(event: DropPositionEvent) {
     const movedSectionId = $cards[event.detail.siblingId].postId;
 
-    updateUnsubscribe = cardApi
+    const unsubscriber = cardApi
       .update({
         id,
         body: {
@@ -177,14 +181,18 @@
         sections.updateEntity(movedSectionId, ({ comments, ...section }) => {
           return { ...section, comments: uniq([...comments, id]) };
         });
+
+        unsubscriber();
       });
+    unsubscribers.push(unsubscriber);
   }
 
   onDestroy(() => {
-    createUnsubscribe && createUnsubscribe();
-    updateUnsubscribe && updateUnsubscribe();
-    deleteUnsubscribe && deleteUnsubscribe();
-    unsubscribers.forEach((unsubscriber) => unsubscriber());
+    try {
+      unsubscribers.forEach((unsubscriber) => unsubscriber());
+    } catch (error) {
+      unsubscribeErrorHandler(error);
+    }
   });
 </script>
 
