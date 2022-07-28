@@ -14,6 +14,7 @@
   import { groupId as cardGroupId } from './Card.svelte';
   import Cards from './Cards.svelte';
   import IdBadge from './IdBadge.svelte';
+  import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
 
@@ -239,6 +240,7 @@
     ]}
   >
     <IdBadge {id} />
+    <PositionBadge position={section?.position} />
 
     {#if isEdit}
       <Content

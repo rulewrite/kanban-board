@@ -10,6 +10,7 @@
   import { arrange, removePosition } from './actions/arrange/arrange';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
+  import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
 
@@ -204,6 +205,7 @@
     on:mouseleave={() => (isHover = false)}
   >
     <IdBadge {id} isSubColor={true} />
+    <PositionBadge position={card?.position} isSubColor={true} />
 
     {#if isEdit}
       <Content>
