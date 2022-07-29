@@ -166,6 +166,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
       .then<E>((response) => response.json())
       .then((response) => {
         status.success({
+          id,
           ...response,
           ...body,
         });
