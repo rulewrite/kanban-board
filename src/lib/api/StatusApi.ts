@@ -58,7 +58,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
     const $status = get(status);
     if ($status.isFetching) {
-      return status;
+      return { subscribe: status.subscribe };
     }
 
     status.request();
@@ -74,7 +74,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
         status.failure(error.message ?? 'Unknown Error');
       });
 
-    return status;
+    return { subscribe: status.subscribe };
   }
 
   read({ id, params, isForce }: { id: E['id']; params: P; isForce?: boolean }) {
@@ -87,7 +87,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
     const $status = get(status);
     if ($status.isFetching) {
-      return status;
+      return { subscribe: status.subscribe };
     }
 
     if (
@@ -108,7 +108,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
         });
     }
 
-    return status;
+    return { subscribe: status.subscribe };
   }
 
   readList({ params, isForce }: { params: P; isForce?: boolean }) {
@@ -121,7 +121,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
     const $status = get(status);
     if ($status.isFetching) {
-      return status;
+      return { subscribe: status.subscribe };
     }
 
     if (
@@ -142,7 +142,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
         });
     }
 
-    return status;
+    return { push: status.push, subscribe: status.subscribe };
   }
 
   update({ id, body, params }: { id: E['id']; body: Partial<E>; params?: P }) {
@@ -155,7 +155,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
     const $status = get(status);
     if ($status.isFetching) {
-      return status;
+      return { subscribe: status.subscribe };
     }
 
     status.request();
@@ -174,7 +174,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
         status.failure(error.message ?? 'Unknown Error');
       });
 
-    return status;
+    return { subscribe: status.subscribe };
   }
 
   delete({ id, params }: { id: E['id']; params?: P }) {
@@ -187,7 +187,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
     const $status = get(status);
     if ($status.isFetching) {
-      return status;
+      return { subscribe: status.subscribe };
     }
 
     status.request();
@@ -202,6 +202,6 @@ export default class StatusApi<P extends Object, E extends Entity> {
         status.failure(error.message ?? 'Unknown Error');
       });
 
-    return status;
+    return { subscribe: status.subscribe };
   }
 }
