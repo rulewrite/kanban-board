@@ -26,7 +26,7 @@ export const getUpdatePostion = (d: typeof dragging) => {
 
   const prevElement =
     $dragging.previousElementSibling as ArrangealbeHTMLElement;
-  const prevPorps = utils.getNodeProps(prevElement);
+  const prevPorps = prevElement && utils.getNodeProps(prevElement);
   if (prevElement && prevPorps) {
     const { positions, position } = prevPorps;
     return {
@@ -36,7 +36,7 @@ export const getUpdatePostion = (d: typeof dragging) => {
   }
 
   const nextElement = $dragging.nextElementSibling as ArrangealbeHTMLElement;
-  const nextProps = utils.getNodeProps(nextElement);
+  const nextProps = nextElement && utils.getNodeProps(nextElement);
   if (nextElement && nextProps) {
     const { positions, position } = nextProps;
     return {
