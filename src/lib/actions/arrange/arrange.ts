@@ -49,7 +49,10 @@ export const getUpdatePostion = (d: typeof dragging) => {
 };
 
 const dragstart: DraggableParameter['dragstart'] = (event) => {
-  event.currentTarget.classList.add(draggingClassName);
+  const currentTarget = event.currentTarget;
+  setTimeout(() => {
+    currentTarget.classList.add(draggingClassName);
+  });
 };
 
 const dragend: DraggableParameter['dragend'] = (event) => {
