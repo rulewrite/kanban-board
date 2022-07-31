@@ -75,7 +75,7 @@ const drop: DroppableParameter['drop'] = (e, dragging) => {
 
   const $dragging = dragging.getElement();
   $dragging.dispatchEvent(
-    new CustomEvent<DropPositionEvent['detail']>('dropPosition', {
+    new CustomEvent<ChangePositionEvent['detail']>('changePosition', {
       detail: {
         siblingId: utils.getNodeProps($sibling).id,
         position,

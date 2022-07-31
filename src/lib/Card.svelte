@@ -150,7 +150,7 @@
     unsubscribers.push(unsubscriber);
   }
 
-  function dropPosition(event: DropPositionEvent) {
+  function updatePosition(event: ChangePositionEvent) {
     const movedSectionId = $cards[event.detail.siblingId].postId;
 
     const unsubscriber = cardApi
@@ -206,7 +206,7 @@
         positions: cardPositions,
       }
     : null}
-  on:dropPosition={dropPosition}
+  on:changePosition={updatePosition}
 >
   <Card
     variant="outlined"

@@ -158,7 +158,7 @@
     unsubscribers.push(unsubscriber);
   }
 
-  function dropPosition(event: DropPositionEvent) {
+  function updatePosition(event: ChangePositionEvent) {
     const unsubscriber = sectionApi
       .update({
         id,
@@ -238,7 +238,7 @@
         positions: sectionPositions,
       }
     : null}
-  on:dropPosition={dropPosition}
+  on:changePosition={updatePosition}
 >
   <Paper
     use={[
