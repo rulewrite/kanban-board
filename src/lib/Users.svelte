@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import Button from '@smui/button';
-  import Card, { Actions, Content } from '@smui/card';
   import Chip, { Set, Text, TrailingIcon } from '@smui/chips';
+  import Paper, { Content, Title } from '@smui/paper';
   import Textfield, { TextfieldComponentDev } from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
   import Icon from '@smui/textfield/icon';
@@ -118,7 +118,9 @@
 </script>
 
 <div class="wrapper">
-  <Card>
+  <Paper>
+    <Title>담당자 리스트</Title>
+
     <Content>
       <Set chips={validUsers} let:chip={user} key={(user) => user.id}>
         <Chip chip={user.id}>
@@ -131,7 +133,9 @@
           </TrailingIcon>
         </Chip>
       </Set>
+    </Content>
 
+    <Content>
       {#if isAdd}
         <Textfield
           bind:this={emailInput}
@@ -149,15 +153,11 @@
             이메일을 올바르게 입력해주세요.
           </HelperText>
         </Textfield>
+      {:else}
+        <Button on:click={toggle}>추가</Button>
       {/if}
     </Content>
-
-    {#if !isAdd}
-      <Actions>
-        <Button on:click={toggle}>추가</Button>
-      </Actions>
-    {/if}
-  </Card>
+  </Paper>
 </div>
 
 <style>
