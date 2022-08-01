@@ -22,25 +22,26 @@ const { utils } = createPropsElement<{
 type ArrangealbeHTMLElement = ReturnType<typeof utils['setNodeProps']>;
 
 export const getUpdatePostion = (d: typeof dragging) => {
-  const $dragging = d.getElement();
+  const draggingElement = d.getElement();
 
   const prevElement =
-    $dragging.previousElementSibling as ArrangealbeHTMLElement;
+    draggingElement.previousElementSibling as ArrangealbeHTMLElement;
   const prevPorps = prevElement && utils.getNodeProps(prevElement);
   if (prevElement && prevPorps) {
     const { positions, position } = prevPorps;
     return {
-      $sibling: prevElement,
+      siblingElement: prevElement,
       position: positions.getBetween(true, position),
     };
   }
 
-  const nextElement = $dragging.nextElementSibling as ArrangealbeHTMLElement;
+  const nextElement =
+    draggingElement.nextElementSibling as ArrangealbeHTMLElement;
   const nextProps = nextElement && utils.getNodeProps(nextElement);
   if (nextElement && nextProps) {
     const { positions, position } = nextProps;
     return {
-      $sibling: nextElement,
+      siblingElement: nextElement,
       position: positions.getBetween(false, position),
     };
   }
@@ -59,12 +60,12 @@ const dragend: DraggableParameter['dragend'] = (event) => {
   event.currentTarget.classList.remove(draggingClassName);
 };
 
-const dragenter: DroppableParameter['dragenter'] = (event, $dragging) => {
-  const $sibling = event.currentTarget;
-  const isNext = $sibling.nextElementSibling === $dragging;
-  $sibling.parentNode.insertBefore(
-    $dragging,
-    isNext ? $sibling : $sibling.nextElementSibling
+const dragenter: DroppableParameter['dragenter'] = (event, draggingElement) => {
+  const siblingElement = event.currentTarget;
+  const isNext = siblingElement.nextElementSibling === draggingElement;
+  siblingElement.parentNode.insertBefore(
+    draggingElement,
+    isNext ? siblingElement : siblingElement.nextElementSibling
   );
 };
 
@@ -74,13 +75,13 @@ const drop: DroppableParameter['drop'] = (e, dragging) => {
     return;
   }
 
-  const { $sibling, position } = updatePostion;
+  const { siblingElement, position } = updatePostion;
 
-  const $dragging = dragging.getElement();
-  $dragging.dispatchEvent(
+  const draggingElement = dragging.getElement();
+  draggingElement.dispatchEvent(
     new CustomEvent<ChangePositionEvent['detail']>('changePosition', {
       detail: {
-        siblingId: utils.getNodeProps($sibling).id,
+        siblingId: utils.getNodeProps(siblingElement).id,
         position,
       },
     })

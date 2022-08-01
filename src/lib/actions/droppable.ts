@@ -4,8 +4,14 @@ import { DraggableHTMLElement, dragging } from './draggable';
 
 export const dragentered = createPropsElement<{
   groupIds: Array<Symbol>;
-  dragenter?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
-  dragleave?: (e: DroppableEvent, $dragging: DraggableHTMLElement) => void;
+  dragenter?: (
+    e: DroppableEvent,
+    draggingElement: DraggableHTMLElement
+  ) => void;
+  dragleave?: (
+    e: DroppableEvent,
+    draggingElement: DraggableHTMLElement
+  ) => void;
   drop?: (e: DroppableEvent, d: typeof dragging) => void;
 }>();
 
@@ -55,24 +61,24 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DroppableEvent) => {
       event.stopPropagation();
 
-      const $dragging = dragging.getElement();
-      const $currentTarget = event.currentTarget as DroppableHTMLElement &
+      const draggingElement = dragging.getElement();
+      const currentTarget = event.currentTarget as DroppableHTMLElement &
         DraggableHTMLElement;
 
-      if ($dragging === $currentTarget) {
+      if (draggingElement === currentTarget) {
         return;
       }
 
       if (
         !dragentered.utils
-          .getNodeProps($currentTarget)
+          .getNodeProps(currentTarget)
           .groupIds.includes(dragging.getProps().groupId)
       ) {
         return;
       }
 
-      dragentered.bind($currentTarget);
-      dragentered.getProps()?.dragenter(event, $dragging);
+      dragentered.bind(currentTarget);
+      dragentered.getProps()?.dragenter(event, draggingElement);
     },
   ],
   [
@@ -81,17 +87,16 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     (event: DroppableEvent) => {
       event.stopPropagation();
 
-      const $currentTarget = event.currentTarget;
+      const currentTarget = event.currentTarget;
       if (
         !dragentered.utils
-          .getNodeProps($currentTarget)
+          .getNodeProps(currentTarget)
           .groupIds.includes(dragging.getProps().groupId)
       ) {
         return;
       }
 
-      const dragleave =
-        dragentered.utils.getNodeProps($currentTarget).dragleave;
+      const dragleave = dragentered.utils.getNodeProps(currentTarget).dragleave;
       if (!dragleave) {
         return;
       }

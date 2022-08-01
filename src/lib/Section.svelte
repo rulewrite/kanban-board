@@ -26,8 +26,8 @@
   export const groupId = Symbol('sectionsArrange');
   const editSectionId = createEditId();
   const exceptClickOutsideDataset = 'data-except-click-outside';
-  const dragenter: Parameter['dragenter'] = (event, $dragging) => {
-    event.currentTarget.appendChild($dragging);
+  const dragenter: Parameter['dragenter'] = (event, draggingElement) => {
+    event.currentTarget.appendChild(draggingElement);
   };
 </script>
 

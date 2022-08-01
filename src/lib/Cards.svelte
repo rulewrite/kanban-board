@@ -12,8 +12,11 @@
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
 
-  const dragenter: Parameter['dragenter'] = (event, $dragging) => {
-    event.currentTarget.parentNode.insertBefore($dragging, event.currentTarget);
+  const dragenter: Parameter['dragenter'] = (event, draggingElement) => {
+    event.currentTarget.parentNode.insertBefore(
+      draggingElement,
+      event.currentTarget
+    );
   };
 </script>
 

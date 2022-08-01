@@ -11,13 +11,13 @@
   let isHover = false;
   let deleteUnsubscribe: Unsubscriber;
 
-  const dragenter: Parameter['dragenter'] = (e, $dragging) => {
-    $dragging.hidden = true;
+  const dragenter: Parameter['dragenter'] = (e, draggingElement) => {
+    draggingElement.hidden = true;
     isHover = true;
   };
 
-  const dragleave: Parameter['dragleave'] = (e, $dragging) => {
-    $dragging.hidden = false;
+  const dragleave: Parameter['dragleave'] = (e, draggingElement) => {
+    draggingElement.hidden = false;
     isHover = false;
 
     dragentered.clear();
