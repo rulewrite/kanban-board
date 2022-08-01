@@ -7,7 +7,11 @@ import {
   dragging,
   Parameter as DraggableParameter,
 } from './draggable';
-import { droppable, Parameter as DroppableParameter } from './droppable';
+import {
+  droppable,
+  DroppableHTMLElement,
+  Parameter as DroppableParameter,
+} from './droppable';
 
 const draggableClassName = css`
   cursor: pointer;
@@ -32,6 +36,7 @@ const draggingClassName = css`
 `;
 
 const { utils } = createPropsElement<{
+  isHorizontal: boolean;
   groupId: Symbol;
   id: number;
   position: number;
@@ -68,6 +73,11 @@ export const getUpdatePostion = (d: typeof dragging) => {
   return null;
 };
 
+const mouse = {
+  x: NaN,
+  y: NaN,
+};
+
 const dragstart: DraggableParameter['dragstart'] = (event) => {
   const currentTarget = event.currentTarget;
   setTimeout(() => {
@@ -76,15 +86,27 @@ const dragstart: DraggableParameter['dragstart'] = (event) => {
 };
 
 const dragend: DraggableParameter['dragend'] = (event) => {
+  mouse.x = NaN;
+  mouse.y = NaN;
   event.currentTarget.classList.remove(draggingClassName);
 };
 
-const dragenter: DroppableParameter['dragenter'] = (event, draggingElement) => {
-  const siblingElement = event.currentTarget;
-  const isNext = siblingElement.nextElementSibling === draggingElement;
-  siblingElement.parentNode.insertBefore(
+const dragenter: DroppableParameter['dragenter'] = (event) => {
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
+};
+
+const dragover: DroppableParameter['dragover'] = (event, draggingElement) => {
+  const currentTarget = event.currentTarget as DroppableHTMLElement &
+    ArrangealbeHTMLElement;
+
+  const isToPrev = utils.getNodeProps(currentTarget).isHorizontal
+    ? mouse.x > event.clientX
+    : mouse.y > event.clientY;
+
+  currentTarget.parentNode.insertBefore(
     draggingElement,
-    isNext ? siblingElement : siblingElement.nextElementSibling
+    isToPrev ? currentTarget : currentTarget.nextElementSibling
   );
 };
 
@@ -133,7 +155,7 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
 
   const { update: updateDroppable, destroy: destroyDroppable } = droppable(
     node,
-    { groupIds: [groupId], dragenter, drop }
+    { groupIds: [groupId], dragenter, dragover, drop }
   );
 
   return {
@@ -149,6 +171,7 @@ export const arrange: Action<HTMLElement, Parameter | null> = (
       updateDroppable({
         groupIds: [updatedParameter.groupId],
         dragenter,
+        dragover,
         drop,
       });
     },

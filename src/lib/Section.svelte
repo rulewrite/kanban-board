@@ -232,6 +232,7 @@
   class="placeholder"
   use:arrange={section
     ? {
+        isHorizontal: true,
         groupId,
         id: section.id,
         position: section.position,

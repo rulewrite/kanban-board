@@ -200,6 +200,7 @@
   class="wrapper"
   use:arrange={card
     ? {
+        isHorizontal: false,
         groupId,
         id: card.id,
         position: card.position,

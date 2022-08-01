@@ -8,6 +8,7 @@ export const dragentered = createPropsElement<{
     e: DroppableEvent,
     draggingElement: DraggableHTMLElement
   ) => void;
+  dragover?: (e: DroppableEvent, draggingElement: DraggableHTMLElement) => void;
   dragleave?: (
     e: DroppableEvent,
     draggingElement: DraggableHTMLElement
@@ -82,6 +83,31 @@ const mapEventTypeToListener = new Map<string, EventListener>([
     },
   ],
   [
+    'dragover',
+    (event: DroppableEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const draggingElement = dragging.getElement();
+      const currentTarget = event.currentTarget as DroppableHTMLElement &
+        DraggableHTMLElement;
+
+      if (draggingElement === currentTarget) {
+        return;
+      }
+
+      if (
+        !dragentered.utils
+          .getNodeProps(currentTarget)
+          .groupIds.includes(dragging.getProps().groupId)
+      ) {
+        return;
+      }
+
+      dragentered.getProps()?.dragover(event, draggingElement);
+    },
+  ],
+  [
     // 드래그 중인 대상이 적합한 드롭 대상에서 벗어났을 때
     'dragleave',
     (event: DroppableEvent) => {
@@ -102,7 +128,6 @@ const mapEventTypeToListener = new Map<string, EventListener>([
       }
 
       const rect = event.currentTarget.getBoundingClientRect();
-
       if (
         event.clientX <= rect.left ||
         event.clientX >= rect.right ||
@@ -131,6 +156,10 @@ export function droppable(
 
   set(node, parameter);
   mapEventTypeToListener.forEach((listener, eventType) => {
+    if (eventType === 'dragover' && !parameter.dragover) {
+      return;
+    }
+
     node.addEventListener(eventType, listener);
   });
 
