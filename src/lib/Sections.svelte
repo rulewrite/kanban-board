@@ -2,6 +2,7 @@
   import Button, { Group } from '@smui/button';
   import { onMount } from 'svelte';
   import { sectionApi } from './api/jsonPlaceholder';
+  import Ids from './Ids.svelte';
   import Section from './Section.svelte';
   import { isDeleted, mapKeyToEntities } from './store/entities';
 
@@ -35,7 +36,7 @@
   </Group>
 </div>
 
-<div class="mdc-typography--caption">{ids}</div>
+<Ids {ids} />
 
 <div class="wrapper">
   {#each ids as id (id)}

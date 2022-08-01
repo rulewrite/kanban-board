@@ -7,6 +7,7 @@
   import { droppable, Parameter } from './actions/droppable';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import Card, { groupId } from './Card.svelte';
+  import Ids from './Ids.svelte';
   import { isDeleted, mapKeyToEntities } from './store/entities';
 
   const sections = mapKeyToEntities.sections;
@@ -78,7 +79,7 @@
 
 <Content>
   {#if cardIds.length}
-    <div class="mdc-typography--caption">{cardIds}</div>
+    <Ids ids={cardIds} />
 
     {#each cardIds as cardId (cardId)}
       <Card id={cardId} {sectionId} />
