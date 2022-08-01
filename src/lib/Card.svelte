@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import Button, { Label } from '@smui/button';
   import Card, { Actions, Content } from '@smui/card';
+  import Select, { Option } from '@smui/select';
   import type { TextfieldComponentDev } from '@smui/textfield';
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text';
@@ -21,6 +22,7 @@
     isHorizontal: false,
     positions: mapKeyToEntities.cards.positions,
   });
+  const users = mapKeyToEntities.users;
 
   export const groupId = Symbol('cardsArrange');
   const editCardId = createEditId();
@@ -33,6 +35,7 @@
 
   let bodyInput: TextfieldComponentDev;
   let body = '';
+  let email = '';
   let isHover = false;
 
   $: card = $cards[id];
@@ -45,6 +48,7 @@
       }
 
       body = card?.body ?? '';
+      email = card?.email ?? '';
 
       await tick();
 
@@ -81,6 +85,7 @@
 
     return {
       body: trimedBody,
+      email,
     };
   }
 
@@ -231,11 +236,19 @@
             내용을 올바르게 입력해주세요.
           </HelperText>
         </Textfield>
+
+        <Select bind:value={email} label="Select Menu">
+          {#each uniq( [...Object.values($users).map((user) => user.email), card.email] ) as email (email)}
+            <Option value={email}>{email}</Option>
+          {/each}
+        </Select>
       </Content>
     {:else if card}
       <Content>
         {card.body}
-        <p class="mdc-typography--caption">{card.email}</p>
+        {#if card.email}
+          <p class="mdc-typography--caption">{card.email}</p>
+        {/if}
       </Content>
     {/if}
 

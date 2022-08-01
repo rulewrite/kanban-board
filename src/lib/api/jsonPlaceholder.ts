@@ -26,7 +26,7 @@ export interface User {
   id: number;
   name: string;
   username: string;
-  email: string;
+  email?: string;
 }
 const userSchema = new schema.Entity<User>(USERS_SCHEMA_KEY);
 export const userApi = new StatusApi<Params, User>(`${URL}/users`, userSchema);
