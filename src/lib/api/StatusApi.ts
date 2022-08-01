@@ -157,16 +157,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
     const method = 'PATCH';
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
 
-    const key = StatusApi.getKey(url, method);
-    if (!this.mapKeyToStatusEntity.has(key)) {
-      this.mapKeyToStatusEntity.set(key, this.createStatusEntity(key));
-    }
-    const status = this.mapKeyToStatusEntity.get(key);
-
-    const $status = get(status);
-    if ($status.isFetching) {
-      return { subscribe: status.subscribe };
-    }
+    const status = this.createStatusEntity(StatusApi.getKey(url, method));
 
     status.request();
     fetch(url, {
