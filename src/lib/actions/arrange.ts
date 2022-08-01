@@ -1,16 +1,35 @@
+import { css } from '@emotion/css';
 import type { Positions } from 'src/lib/store/positions';
 import type { Action } from 'svelte/action';
-import { createPropsElement } from '../../store/propsElement';
+import { createPropsElement } from '../store/propsElement';
 import {
   draggable,
   dragging,
   Parameter as DraggableParameter,
-} from '../draggable';
-import { droppable, Parameter as DroppableParameter } from '../droppable';
-import {
-  draggable as draggableClassName,
-  dragging as draggingClassName,
-} from './style';
+} from './draggable';
+import { droppable, Parameter as DroppableParameter } from './droppable';
+
+const draggableClassName = css`
+  cursor: pointer;
+`;
+
+const draggingClassName = css`
+  opacity: 0.5;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+
+  ::after {
+    content: '';
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: #ccc;
+  }
+`;
 
 const { utils } = createPropsElement<{
   groupId: Symbol;

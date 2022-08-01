@@ -3,7 +3,7 @@
   import { uniq } from 'lodash-es';
   import { onDestroy } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { getUpdatePostion } from './actions/arrange/arrange';
+  import { getUpdatePostion } from './actions/arrange';
   import { droppable, Parameter } from './actions/droppable';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import Card, { groupId } from './Card.svelte';
