@@ -43,6 +43,9 @@ export default class StatusApi<P extends Object, E extends Entity> {
   private createStatusEntity: ReturnType<typeof getCreateStatusEntity>;
   private createStatusEntities: ReturnType<typeof getCreateStatusEntities>;
 
+  // 더미 API에서 POST시 같은 id로만 생성되어 추가
+  private createId = 501;
+
   constructor(
     private readonly URL: string,
     schema: schema.Entity<E>,
@@ -67,6 +70,10 @@ export default class StatusApi<P extends Object, E extends Entity> {
       return { subscribe: status.subscribe };
     }
 
+    body = {
+      id: this.createId++,
+      ...body,
+    };
     status.request();
     fetch(url, {
       method,
