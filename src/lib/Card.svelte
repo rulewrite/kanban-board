@@ -233,7 +233,10 @@
         </Textfield>
       </Content>
     {:else if card}
-      <Content>{card.body}</Content>
+      <Content>
+        {card.body}
+        <p class="mdc-typography--caption">{card.email}</p>
+      </Content>
     {/if}
 
     {#if (card && isHover) || isEdit}
