@@ -1,6 +1,6 @@
 import { merge } from 'lodash-es';
 import { get, writable } from 'svelte/store';
-import type { Card, Section } from '../api/jsonPlaceholder';
+import type { Card, Section, User } from '../api/jsonPlaceholder';
 import { createPositions, Position } from './positions';
 
 export interface Entity {
@@ -84,11 +84,13 @@ function createOrderedEntities<Oe extends OrderedEntity>() {
 
 export const SECTIONS_SCHEMA_KEY = 'sections';
 export const CARDS_SCHEMA_KEY = 'cards';
+export const USERS_SCHEMA_KEY = 'users';
 
 export type EntitiesKeys = keyof typeof mapKeyToEntities;
 export const mapKeyToEntities = {
   [SECTIONS_SCHEMA_KEY]: createOrderedEntities<Section>(),
   [CARDS_SCHEMA_KEY]: createOrderedEntities<Card>(),
+  [USERS_SCHEMA_KEY]: createEntities<User>(),
 } as const;
 
 export const mergeEntities = (normalized: {

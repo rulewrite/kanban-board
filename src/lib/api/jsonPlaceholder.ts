@@ -1,5 +1,9 @@
 import { schema } from 'normalizr';
-import { CARDS_SCHEMA_KEY, SECTIONS_SCHEMA_KEY } from '../store/entities';
+import {
+  CARDS_SCHEMA_KEY,
+  SECTIONS_SCHEMA_KEY,
+  USERS_SCHEMA_KEY,
+} from '../store/entities';
 import { arrangeUnit } from '../store/positions';
 import StatusApi from './StatusApi';
 
@@ -18,11 +22,20 @@ interface Params {
 
 const URL = 'https://jsonplaceholder.typicode.com';
 
+export interface User {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+}
+const userSchema = new schema.Entity<User>(USERS_SCHEMA_KEY);
+export const userApi = new StatusApi<Params, User>(`${URL}/users`, userSchema);
+
 export interface Card {
   postId: number;
   id: number;
   name: string;
-  email: string;
+  email: User['email'];
   body: string;
   position: number;
 }
