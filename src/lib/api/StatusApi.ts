@@ -33,6 +33,10 @@ export default class StatusApi<P extends Object, E extends Entity> {
     return `${pathname}${StatusApi.paramsToString(params)}`;
   }
 
+  private static getKey(url: string, method = 'GET') {
+    return `${method} ${url}`;
+  }
+
   private mapKeyToStatusEntity = new Map<string, StatusEntityStore>();
   private mapKeyToStatusEntities = new Map<string, StatusEntitiesStore>();
 
@@ -49,12 +53,14 @@ export default class StatusApi<P extends Object, E extends Entity> {
   }
 
   create({ body, params }: { body: Partial<Omit<E, 'id'>>; params?: P }) {
+    const method = 'POST';
     const url = StatusApi.getUrl<P>(this.URL, params);
 
-    if (!this.mapKeyToStatusEntity.has(url)) {
-      this.mapKeyToStatusEntity.set(url, this.createStatusEntity(url));
+    const key = StatusApi.getKey(url, method);
+    if (!this.mapKeyToStatusEntity.has(key)) {
+      this.mapKeyToStatusEntity.set(key, this.createStatusEntity(key));
     }
-    const status = this.mapKeyToStatusEntity.get(url);
+    const status = this.mapKeyToStatusEntity.get(key);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -63,7 +69,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
     status.request();
     fetch(url, {
-      method: 'POST',
+      method,
       body: JSON.stringify(body),
     })
       .then<E>((response) => response.json())
@@ -80,10 +86,11 @@ export default class StatusApi<P extends Object, E extends Entity> {
   read({ id, params, isForce }: { id: E['id']; params: P; isForce?: boolean }) {
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
 
-    if (!this.mapKeyToStatusEntity.has(url)) {
-      this.mapKeyToStatusEntity.set(url, this.createStatusEntity(url));
+    const key = StatusApi.getKey(url);
+    if (!this.mapKeyToStatusEntity.has(key)) {
+      this.mapKeyToStatusEntity.set(key, this.createStatusEntity(key));
     }
-    const status = this.mapKeyToStatusEntity.get(url);
+    const status = this.mapKeyToStatusEntity.get(key);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -114,10 +121,11 @@ export default class StatusApi<P extends Object, E extends Entity> {
   readList({ params, isForce }: { params: P; isForce?: boolean }) {
     const url = StatusApi.getUrl<P>(this.URL, params);
 
-    if (!this.mapKeyToStatusEntities.has(url)) {
-      this.mapKeyToStatusEntities.set(url, this.createStatusEntities(url));
+    const key = StatusApi.getKey(url);
+    if (!this.mapKeyToStatusEntities.has(key)) {
+      this.mapKeyToStatusEntities.set(key, this.createStatusEntities(key));
     }
-    const status = this.mapKeyToStatusEntities.get(url);
+    const status = this.mapKeyToStatusEntities.get(key);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -146,12 +154,14 @@ export default class StatusApi<P extends Object, E extends Entity> {
   }
 
   update({ id, body, params }: { id: E['id']; body: Partial<E>; params?: P }) {
+    const method = 'PATCH';
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
 
-    if (!this.mapKeyToStatusEntity.has(url)) {
-      this.mapKeyToStatusEntity.set(url, this.createStatusEntity(url));
+    const key = StatusApi.getKey(url, method);
+    if (!this.mapKeyToStatusEntity.has(key)) {
+      this.mapKeyToStatusEntity.set(key, this.createStatusEntity(key));
     }
-    const status = this.mapKeyToStatusEntity.get(url);
+    const status = this.mapKeyToStatusEntity.get(key);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -160,7 +170,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
     status.request();
     fetch(url, {
-      method: 'PATCH',
+      method,
       body: JSON.stringify(body),
     })
       .then<E>((response) => response.json())
@@ -179,12 +189,14 @@ export default class StatusApi<P extends Object, E extends Entity> {
   }
 
   delete({ id, params }: { id: E['id']; params?: P }) {
+    const method = 'DELETE';
     const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
 
-    if (!this.mapKeyToStatusEntity.has(url)) {
-      this.mapKeyToStatusEntity.set(url, this.createStatusEntity(url));
+    const key = StatusApi.getKey(url, method);
+    if (!this.mapKeyToStatusEntity.has(key)) {
+      this.mapKeyToStatusEntity.set(key, this.createStatusEntity(key));
     }
-    const status = this.mapKeyToStatusEntity.get(url);
+    const status = this.mapKeyToStatusEntity.get(key);
 
     const $status = get(status);
     if ($status.isFetching) {
@@ -193,7 +205,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
     status.request();
     fetch(url, {
-      method: 'DELETE',
+      method,
     })
       .then<{}>((response) => response.json())
       .then(() => {
