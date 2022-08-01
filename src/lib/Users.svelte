@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+  import Card, { Content } from '@smui/card';
   import Chip, { Set, Text, TrailingIcon } from '@smui/chips';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
@@ -49,14 +50,26 @@
   };
 </script>
 
-<Set chips={validUsers} let:chip={user} key={(user) => user.id}>
-  <Chip chip={user.id}>
-    <Text>{user.email}</Text>
-    <TrailingIcon class="material-icons" on:click={() => deleteUser(user.id)}>
-      cancel
-    </TrailingIcon>
-  </Chip>
-</Set>
+<div class="wrapper">
+  <Card>
+    <Content>
+      <Set chips={validUsers} let:chip={user} key={(user) => user.id}>
+        <Chip chip={user.id}>
+          <Text>{user.email}</Text>
+          <TrailingIcon
+            class="material-icons"
+            on:click={() => deleteUser(user.id)}
+          >
+            cancel
+          </TrailingIcon>
+        </Chip>
+      </Set>
+    </Content>
+  </Card>
+</div>
 
 <style>
+  .wrapper {
+    margin-bottom: 20px;
+  }
 </style>
