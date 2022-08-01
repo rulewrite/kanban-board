@@ -7,7 +7,7 @@
   import { uniqueId } from 'lodash-es';
   import { createEventDispatcher, onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { arrange } from './actions/arrange';
+  import { createArrange } from './actions/arrange';
   import { clickOutside } from './actions/clickOutside';
   import { droppable, Parameter } from './actions/droppable';
   import { Section, sectionApi } from './api/jsonPlaceholder';
@@ -20,8 +20,11 @@
   import { unsubscribeErrorHandler } from './utils';
 
   const sections = mapKeyToEntities.sections;
-  const sectionPositions = mapKeyToEntities.sections.positions;
   const cards = mapKeyToEntities.cards;
+  const arrange = createArrange({
+    isHorizontal: true,
+    positions: mapKeyToEntities.sections.positions,
+  });
 
   export const groupId = Symbol('sectionsArrange');
   const editSectionId = createEditId();
@@ -232,11 +235,9 @@
   class="placeholder"
   use:arrange={section
     ? {
-        isHorizontal: true,
         groupId,
         id: section.id,
         position: section.position,
-        positions: sectionPositions,
       }
     : null}
   on:changePosition={updatePosition}

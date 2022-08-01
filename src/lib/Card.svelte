@@ -7,7 +7,7 @@
   import { uniq, uniqueId } from 'lodash-es';
   import { onDestroy, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { arrange } from './actions/arrange';
+  import { createArrange } from './actions/arrange';
   import { Card as CardType, cardApi, Section } from './api/jsonPlaceholder';
   import IdBadge from './IdBadge.svelte';
   import PositionBadge from './PositionBadge.svelte';
@@ -17,7 +17,10 @@
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;
-  const cardPositions = mapKeyToEntities.cards.positions;
+  const arrange = createArrange({
+    isHorizontal: false,
+    positions: mapKeyToEntities.cards.positions,
+  });
 
   export const groupId = Symbol('cardsArrange');
   const editCardId = createEditId();
@@ -200,11 +203,9 @@
   class="wrapper"
   use:arrange={card
     ? {
-        isHorizontal: false,
         groupId,
         id: card.id,
         position: card.position,
-        positions: cardPositions,
       }
     : null}
   on:changePosition={updatePosition}

@@ -38,7 +38,8 @@
     const card = cardEntities[cardId];
     const prevSectionId = card.postId;
 
-    const { position = card.position } = getUpdatePostion(dragging) ?? {};
+    const { position = card.position } =
+      getUpdatePostion(mapKeyToEntities.cards.positions, dragging) ?? {};
 
     updateUnsubscribe = cardApi
       .update({

@@ -36,23 +36,21 @@ const draggingClassName = css`
 `;
 
 const { utils } = createPropsElement<{
-  isHorizontal: boolean;
   groupId: Symbol;
   id: number;
   position: number;
-  positions: Positions;
 }>();
 
 type ArrangealbeHTMLElement = ReturnType<typeof utils['setNodeProps']>;
 
-export const getUpdatePostion = (d: typeof dragging) => {
+export const getUpdatePostion = (positions: Positions, d: typeof dragging) => {
   const draggingElement = d.getElement();
 
   const prevElement =
     draggingElement.previousElementSibling as ArrangealbeHTMLElement;
   const prevPorps = prevElement && utils.getNodeProps(prevElement);
   if (prevElement && prevPorps) {
-    const { positions, position } = prevPorps;
+    const { position } = prevPorps;
     return {
       siblingElement: prevElement,
       position: positions.getBetween(true, position),
@@ -63,7 +61,7 @@ export const getUpdatePostion = (d: typeof dragging) => {
     draggingElement.nextElementSibling as ArrangealbeHTMLElement;
   const nextProps = nextElement && utils.getNodeProps(nextElement);
   if (nextElement && nextProps) {
-    const { positions, position } = nextProps;
+    const { position } = nextProps;
     return {
       siblingElement: nextElement,
       position: positions.getBetween(false, position),
@@ -96,89 +94,94 @@ const dragenter: DroppableParameter['dragenter'] = (event) => {
   mouse.y = event.clientY;
 };
 
-const dragover: DroppableParameter['dragover'] = (event, draggingElement) => {
-  const currentTarget = event.currentTarget as DroppableHTMLElement &
-    ArrangealbeHTMLElement;
-
-  const isToPrev = utils.getNodeProps(currentTarget).isHorizontal
-    ? mouse.x > event.clientX
-    : mouse.y > event.clientY;
-
-  currentTarget.parentNode.insertBefore(
-    draggingElement,
-    isToPrev ? currentTarget : currentTarget.nextElementSibling
-  );
-};
-
-const drop: DroppableParameter['drop'] = (e, dragging) => {
-  const updatePostion = getUpdatePostion(dragging);
-  if (!updatePostion) {
-    return;
-  }
-
-  const { siblingElement, position } = updatePostion;
-
-  const draggingElement = dragging.getElement();
-  draggingElement.dispatchEvent(
-    new CustomEvent<ChangePositionEvent['detail']>('changePosition', {
-      detail: {
-        siblingId: utils.getNodeProps(siblingElement).id,
-        position,
-      },
-    })
-  );
-};
-
 type Parameter = ReturnType<typeof utils['getNodeProps']>;
 
 const set = (node: HTMLElement, parameter: Parameter) => {
   utils.setNodeProps(node, parameter);
 };
 
-export const arrange: Action<HTMLElement, Parameter | null> = (
-  node,
-  parameter
-) => {
-  if (parameter === null) {
-    return {};
-  }
+export const createArrange = ({
+  isHorizontal,
+  positions,
+}: {
+  isHorizontal: boolean;
+  positions: Positions;
+}): Action<HTMLElement, Parameter | null> => {
+  const dragover: DroppableParameter['dragover'] = (event, draggingElement) => {
+    const currentTarget = event.currentTarget as DroppableHTMLElement &
+      ArrangealbeHTMLElement;
 
-  node.classList.add(draggableClassName);
+    const isToPrev = isHorizontal
+      ? mouse.x > event.clientX
+      : mouse.y > event.clientY;
 
-  const { id, groupId } = parameter;
-  set(node, parameter);
+    currentTarget.parentNode.insertBefore(
+      draggingElement,
+      isToPrev ? currentTarget : currentTarget.nextElementSibling
+    );
+  };
 
-  const { update: updateDraggable, destroy: destoryDraggable } = draggable(
-    node,
-    { id, groupId, dragstart, dragend }
-  );
+  const drop: DroppableParameter['drop'] = (e, dragging) => {
+    const updatePostion = getUpdatePostion(positions, dragging);
+    if (!updatePostion) {
+      return;
+    }
 
-  const { update: updateDroppable, destroy: destroyDroppable } = droppable(
-    node,
-    { groupIds: [groupId], dragenter, dragover, drop }
-  );
+    const { siblingElement, position } = updatePostion;
 
-  return {
-    update(updatedParameter: Parameter) {
-      set(node, updatedParameter);
+    const draggingElement = dragging.getElement();
+    draggingElement.dispatchEvent(
+      new CustomEvent<ChangePositionEvent['detail']>('changePosition', {
+        detail: {
+          siblingId: utils.getNodeProps(siblingElement).id,
+          position,
+        },
+      })
+    );
+  };
 
-      updateDraggable({
-        id: updatedParameter.id,
-        groupId: updatedParameter.groupId,
-        dragstart,
-        dragend,
-      });
-      updateDroppable({
-        groupIds: [updatedParameter.groupId],
-        dragenter,
-        dragover,
-        drop,
-      });
-    },
-    destroy() {
-      destoryDraggable();
+  return (node, parameter) => {
+    if (parameter === null) {
+      return {};
+    }
 
-      destroyDroppable();
-    },
+    node.classList.add(draggableClassName);
+
+    const { id, groupId } = parameter;
+    set(node, parameter);
+
+    const { update: updateDraggable, destroy: destoryDraggable } = draggable(
+      node,
+      { id, groupId, dragstart, dragend }
+    );
+
+    const { update: updateDroppable, destroy: destroyDroppable } = droppable(
+      node,
+      { groupIds: [groupId], dragenter, dragover, drop }
+    );
+
+    return {
+      update(updatedParameter: Parameter) {
+        set(node, updatedParameter);
+
+        updateDraggable({
+          id: updatedParameter.id,
+          groupId: updatedParameter.groupId,
+          dragstart,
+          dragend,
+        });
+        updateDroppable({
+          groupIds: [updatedParameter.groupId],
+          dragenter,
+          dragover,
+          drop,
+        });
+      },
+      destroy() {
+        destoryDraggable();
+
+        destroyDroppable();
+      },
+    };
   };
 };
