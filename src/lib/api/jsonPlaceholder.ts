@@ -5,7 +5,7 @@ import {
   USERS_SCHEMA_KEY,
 } from '../store/entities';
 import { arrangeUnit } from '../store/positions';
-import StatusApi from './StatusApi';
+import StatusApi from '../utils/StatusApi';
 
 interface Params {
   // Paginate

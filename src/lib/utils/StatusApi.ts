@@ -7,7 +7,7 @@ import {
   StatusEntitiesStore,
   StatusEntityStore,
 } from '../store/status';
-import FetchQueue from '../utils/FetchQueue';
+import FetchQueue from './FetchQueue';
 
 export default class StatusApi<P extends Object, E extends Entity> {
   private static fetchQueue = new FetchQueue();
