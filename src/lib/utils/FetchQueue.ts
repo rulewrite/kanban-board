@@ -18,18 +18,17 @@ export default class FetchQueue {
       return;
     }
 
-    const item = this.queue.shift();
-    const { fetchParams, success, failure } = item;
+    const { fetchParams, success, failure } = this.queue[0];
 
     try {
       const response = await (await fetch(...fetchParams)).json();
       success(response);
 
+      this.queue.shift();
       this.fetch(0);
     } catch (error) {
       failure(error);
 
-      this.queue.unshift(item);
       this.run(interverMs ? interverMs * 2 : FetchQueue.INITIAL_INTERVER_MS);
     }
   }
