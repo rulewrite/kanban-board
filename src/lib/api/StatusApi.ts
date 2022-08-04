@@ -7,8 +7,11 @@ import {
   StatusEntitiesStore,
   StatusEntityStore,
 } from '../store/status';
+import FetchQueue from '../utils/FetchQueue';
 
 export default class StatusApi<P extends Object, E extends Entity> {
+  private static fetchQueue = new FetchQueue();
+
   private static paramsToString<P>(params: P) {
     if (!params) {
       return '';
@@ -167,21 +170,19 @@ export default class StatusApi<P extends Object, E extends Entity> {
     const status = this.createStatusEntity(StatusApi.getKey(url, method));
 
     status.request();
-    fetch(url, {
-      method,
-      body: JSON.stringify(body),
-    })
-      .then<E>((response) => response.json())
-      .then((response) => {
+    StatusApi.fetchQueue.push<E>({
+      fetchParams: [url, { method, body: JSON.stringify(body) }],
+      success: (response) => {
         status.success({
           id,
           ...response,
           ...body,
         });
-      })
-      .catch((error: Error) => {
+      },
+      failure: (error) => {
         status.failure(error.message ?? 'Unknown Error');
-      });
+      },
+    });
 
     return { subscribe: status.subscribe };
   }
