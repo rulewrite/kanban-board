@@ -17,7 +17,7 @@
   import PositionBadge from './PositionBadge.svelte';
   import { createEditId } from './store/editId';
   import { mapKeyToEntities } from './store/entities';
-  import { unsubscribeErrorHandler } from './utils';
+  import { unsubscribeErrorHandler } from './utils/utils';
 
   const sections = mapKeyToEntities.sections;
   const cards = mapKeyToEntities.cards;

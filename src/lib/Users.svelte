@@ -9,7 +9,7 @@
   import type { Unsubscriber } from 'svelte/store';
   import { User, userApi } from './api/jsonPlaceholder';
   import { isDeleted, mapKeyToEntities } from './store/entities';
-  import { unsubscribeErrorHandler } from './utils';
+  import { unsubscribeErrorHandler } from './utils/utils';
 
   const users = mapKeyToEntities.users;
 </script>
