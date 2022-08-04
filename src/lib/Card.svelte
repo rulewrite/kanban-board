@@ -40,6 +40,8 @@
 
   $: card = $cards[id];
   $: isEdit = $editCardId === editId;
+  $: userEmails = Object.values($users).map((user) => user.email);
+  $: emails = card?.email ? uniq([...userEmails, card.email]) : userEmails;
 
   const unsubscribers: Array<Unsubscriber> = [
     editCardId.subscribe(async (id) => {
@@ -238,7 +240,7 @@
         </Textfield>
 
         <Select bind:value={email} label="Select Menu">
-          {#each uniq( [...Object.values($users).map((user) => user.email), card.email] ) as email (email)}
+          {#each emails as email (email)}
             <Option value={email}>{email}</Option>
           {/each}
         </Select>
