@@ -5,7 +5,7 @@ import {
   USERS_SCHEMA_KEY,
 } from '../store/entities';
 import { arrangeUnit } from '../store/positions';
-import StatusApi from '../utils/StatusApi';
+import StatusFetch from '../utils/StatusFetch';
 
 interface Params {
   // Paginate
@@ -29,7 +29,10 @@ export interface User {
   email?: string;
 }
 const userSchema = new schema.Entity<User>(USERS_SCHEMA_KEY);
-export const userApi = new StatusApi<Params, User>(`${URL}/users`, userSchema);
+export const userApi = new StatusFetch<Params, User>(
+  `${URL}/users`,
+  userSchema
+);
 
 export interface Card {
   postId: number;
@@ -55,7 +58,7 @@ const cardSchema = new schema.Entity<Card>(
     },
   }
 );
-export const cardApi = new StatusApi<Params, Card>(
+export const cardApi = new StatusFetch<Params, Card>(
   `${URL}/comments`,
   cardSchema
 );
@@ -68,7 +71,7 @@ export interface Section {
   comments?: Array<Card['id']>;
   position: number;
 }
-export const sectionApi = new StatusApi<Params, Section>(
+export const sectionApi = new StatusFetch<Params, Section>(
   `${URL}/posts`,
   new schema.Entity<Section>(
     SECTIONS_SCHEMA_KEY,

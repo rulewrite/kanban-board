@@ -9,7 +9,7 @@ import {
 } from '../store/status';
 import FetchQueue from './FetchQueue';
 
-export default class StatusApi<P extends Object, E extends Entity> {
+export default class StatusFetch<P extends Object, E extends Entity> {
   private static fetchQueue = new FetchQueue();
 
   private static paramsToString<P>(params: P) {
@@ -33,7 +33,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
   }
 
   private static getUrl<P>(pathname: string, params: P) {
-    return `${pathname}${StatusApi.paramsToString(params)}`;
+    return `${pathname}${StatusFetch.paramsToString(params)}`;
   }
 
   private static getKey(url: string, method = 'GET') {
@@ -60,9 +60,9 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
   create({ body, params }: { body: Partial<Omit<E, 'id'>>; params?: P }) {
     const method = 'POST';
-    const url = StatusApi.getUrl<P>(this.URL, params);
+    const url = StatusFetch.getUrl<P>(this.URL, params);
 
-    const key = StatusApi.getKey(url, method);
+    const key = StatusFetch.getKey(url, method);
     if (!this.mapKeyToStatusEntity.has(key)) {
       this.mapKeyToStatusEntity.set(key, this.createStatusEntity(key));
     }
@@ -94,9 +94,9 @@ export default class StatusApi<P extends Object, E extends Entity> {
   }
 
   read({ id, params, isForce }: { id: E['id']; params: P; isForce?: boolean }) {
-    const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
+    const url = StatusFetch.getUrl<P>(`${this.URL}/${id}`, params);
 
-    const key = StatusApi.getKey(url);
+    const key = StatusFetch.getKey(url);
     if (!this.mapKeyToStatusEntity.has(key)) {
       this.mapKeyToStatusEntity.set(key, this.createStatusEntity(key));
     }
@@ -112,7 +112,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
       !this.expirationMinutes ||
       !$status.receivedAt ||
       Date.now() - $status.receivedAt >
-        StatusApi.minutesToMs(this.expirationMinutes)
+        StatusFetch.minutesToMs(this.expirationMinutes)
     ) {
       status.request();
       fetch(url)
@@ -129,9 +129,9 @@ export default class StatusApi<P extends Object, E extends Entity> {
   }
 
   readList({ params, isForce }: { params: P; isForce?: boolean }) {
-    const url = StatusApi.getUrl<P>(this.URL, params);
+    const url = StatusFetch.getUrl<P>(this.URL, params);
 
-    const key = StatusApi.getKey(url);
+    const key = StatusFetch.getKey(url);
     if (!this.mapKeyToStatusEntities.has(key)) {
       this.mapKeyToStatusEntities.set(key, this.createStatusEntities(key));
     }
@@ -147,7 +147,7 @@ export default class StatusApi<P extends Object, E extends Entity> {
       !this.expirationMinutes ||
       !$status.receivedAt ||
       Date.now() - $status.receivedAt >
-        StatusApi.minutesToMs(this.expirationMinutes)
+        StatusFetch.minutesToMs(this.expirationMinutes)
     ) {
       status.request();
       fetch(url)
@@ -165,12 +165,12 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
   update({ id, body, params }: { id: E['id']; body: Partial<E>; params?: P }) {
     const method = 'PATCH';
-    const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
+    const url = StatusFetch.getUrl<P>(`${this.URL}/${id}`, params);
 
-    const status = this.createStatusEntity(StatusApi.getKey(url, method));
+    const status = this.createStatusEntity(StatusFetch.getKey(url, method));
 
     status.request();
-    StatusApi.fetchQueue.push<E>({
+    StatusFetch.fetchQueue.push<E>({
       fetchParams: [url, { method, body: JSON.stringify(body) }],
       success: (response) => {
         status.success({
@@ -189,9 +189,9 @@ export default class StatusApi<P extends Object, E extends Entity> {
 
   delete({ id, params }: { id: E['id']; params?: P }) {
     const method = 'DELETE';
-    const url = StatusApi.getUrl<P>(`${this.URL}/${id}`, params);
+    const url = StatusFetch.getUrl<P>(`${this.URL}/${id}`, params);
 
-    const key = StatusApi.getKey(url, method);
+    const key = StatusFetch.getKey(url, method);
     if (!this.mapKeyToStatusEntity.has(key)) {
       this.mapKeyToStatusEntity.set(key, this.createStatusEntity(key));
     }
